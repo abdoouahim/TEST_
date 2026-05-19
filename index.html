@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Manager Pro - Fixed Path Edition</title>
+    <title>Stock Manager Pro - Standard Edition</title>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -323,7 +323,7 @@
         });
     }
 
-    // تعديل المسار ليطابق الحروف الكبيرة Images و الامتداد الكبير PNG
+    // إجبار المسار على قراءة الحروف الصغيرة: images و .png تماماً
     function handleProductChange() {
         const selectEl = document.getElementById("productSelect");
         const costInput = document.getElementById("costPriceInput");
@@ -334,7 +334,7 @@
         
         if (p) {
             costInput.value = p.pu;
-            previewImg.src = `Images/${p.id}.PNG`; 
+            previewImg.src = `images/${p.id}.png`; 
             previewImg.style.display = "block";
         } else {
             costInput.value = "";
@@ -394,9 +394,8 @@
         let alertsHTML = "";
 
         products.forEach(p => {
-            // تعديل المسار هنا أيضاً لعرض الصور المصغرة بالجدول السفلي بشكل صحيح
             stockHTML += `<tr>
-                <td><img class="thumb-img" src="Images/${p.id}.PNG" alt="Product"></td>
+                <td><img class="thumb-img" src="images/${p.id}.png" alt="Product"></td>
                 <td style="text-align: left; padding-left: 20px;"><b>${p.name}</b></td>
                 <td><span style="color:#e5e7eb">${p.qty} pcs</span></td>
             </tr>`;
@@ -435,38 +434,6 @@
             `<option value="${p.id}">${p.name} (Dispo: ${p.qty})</option>`
         ).join("");
         if(currentSelection) productSelect.value = currentSelection;
-    }
-
-    function exportExcel(){
-        if(sales.length === 0) return alert("Pas de données à exporter.");
-        let wb = XLSX.utils.book_new();
-        let ws = XLSX.utils.json_to_sheet(sales.map(s => ({
-            Date: s.date,
-            Produit: s.productName,
-            Quantite: s.qty,
-            Chiffre_Affaires: s.ca,
-            Profit: s.profit
-        })));
-        XLSX.utils.book_append_sheet(wb, ws, "Ventes");
-        XLSX.writeFile(wb, "Rapport_Ventes_Dark.xlsx");
-    }
-
-    function exportPDF(){
-        if(sales.length === 0) return alert("Pas de données à exporter.");
-        const { jsPDF } = window.jspdf;
-        let doc = new jsPDF();
-        doc.setFontSize(16);
-        doc.text("Rapport Global des Ventes", 14, 15);
-        doc.setFontSize(11);
-
-        let y = 25;
-        sales.forEach(s => {
-            if(y > 280) { doc.addPage(); y = 20; }
-            doc.text(`${s.date} | ${s.productName} | Qte: ${s.qty} | Profit: ${s.profit.toFixed(2)} DH`, 14, y);
-            y += 10;
-        });
-
-        doc.save("Rapport_Ventes_Dark.pdf");
     }
 </script>
 
