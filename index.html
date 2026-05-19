@@ -295,7 +295,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // هنا تم إزالة جميع علامات التنصيص لأسماء المنتجات نهائياً لمنع أي تعارض برمجي ومطابقتها مع جهازك
+    // قائمة الأسماء الجديدة النظيفة والخالية تماماً من علامات التنصيص لتتوافق مع مجلدك
     const defaultProducts = [
         { id: "1", name: 'sneakers midium quality', qty: 24, pu: 75 },
         { id: "2", name: 'sneakers Low quality', qty: 20, pu: 62 },
@@ -324,22 +324,13 @@
     function init(){
         db.ref("products").on("value", s => {
             products = s.val() || [];
-            if(products.length === 0) {
-                products = [...defaultProducts];
+            
+            // تحقق صارم وجذري: إذا كانت البيانات تحتوي على علامات تنصيص قديمة، نقوم بمسحها فوراً وتحديثها بالقائمة النظيفة
+            let hasOldData = products.some(p => p.name.includes('"'));
+            
+            if(products.length === 0 || hasOldData) {
+                products = JSON.parse(JSON.stringify(defaultProducts));
                 db.ref("products").set(products);
-            } else {
-                // موازنة لضمان تحديث الأسماء القديمة في قاعدة بيانات Firebase بالأسماء الجديدة النظيفة
-                let updated = false;
-                products.forEach(p => {
-                    let match = defaultProducts.find(d => d.id === p.id);
-                    if(match && p.name !== match.name) {
-                        p.name = match.name;
-                        updated = true;
-                    }
-                });
-                if(updated) {
-                    db.ref("products").set(products);
-                }
             }
             render();
             handleProductChange(); 
@@ -363,7 +354,8 @@
         if (p) {
             costInput.value = p.pu;
             let cleanName = p.name.trim();
-            previewImg.src = `images/${cleanName}.jpeg`;
+            // بما أن الامتداد المظهر في صورتك هو png، جعلناه يبدأ بـ .png مباشرة وبحروف صغيرة
+            previewImg.src = `images/${cleanName}.png`;
             previewImg.dataset.name = cleanName;
             previewImg.dataset.step = "1";
             previewImg.style.display = "block";
@@ -373,16 +365,17 @@
         }
     }
 
+    // دالة احتياطية في حال كان هناك صور بصيغة jpeg أو jpg في مجلدك
     function tryAlternativeFormats(imgElement) {
         let name = imgElement.dataset.name;
         let step = imgElement.dataset.step;
 
         if (step === "1") {
             imgElement.dataset.step = "2";
-            imgElement.src = `images/${name}.jpg`;
+            imgElement.src = `images/${name}.jpeg`;
         } else if (step === "2") {
             imgElement.dataset.step = "3";
-            imgElement.src = `images/${name}.png`;
+            imgElement.src = `images/${name}.jpg`;
         } else {
             imgElement.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%239ca3af" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
         }
@@ -446,7 +439,7 @@
             let cleanName = p.name.trim();
             stockHTML += `<tr>
                 <td>
-                    <img class="thumb-img" src="images/${cleanName}.jpeg" data-name="${cleanName}" data-step="1" onerror="tryAlternativeFormats(this)" alt="Product">
+                    <img class="thumb-img" src="images/${cleanName}.png" data-name="${cleanName}" data-step="1" onerror="tryAlternativeFormats(this)" alt="Product">
                 </td>
                 <td style="text-align: left; padding-left: 20px;"><b>${p.name}</b></td>
                 <td><span style="color:#e5e7eb">${p.qty} pcs</span></td>
