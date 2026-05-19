@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Manager Pro - Final Stabilized Edition</title>
+    <title>Stock Manager Pro - Fixed Path Edition</title>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -42,7 +42,6 @@
             font-size: 28px;
             margin-bottom: 30px;
             font-weight: 700;
-            letter-spacing: 0.5px;
         }
 
         h3 {
@@ -51,7 +50,6 @@
             padding-bottom: 12px;
             color: #ffffff;
             font-size: 18px;
-            font-weight: 600;
         }
 
         .card {
@@ -64,7 +62,6 @@
             box-sizing: border-box;
         }
 
-        /* تخطيط متقابل متناسق للمبيعات والبيع */
         .split-grid {
             display: grid;
             grid-template-columns: 1fr 1.6fr; 
@@ -72,9 +69,7 @@
         }
 
         @media (max-width: 950px) {
-            .split-grid {
-                grid-template-columns: 1fr;
-            }
+            .split-grid { grid-template-columns: 1fr; }
         }
 
         label {
@@ -95,7 +90,6 @@
             font-size: 15px;
             background-color: #1f293d;
             color: #ffffff;
-            transition: all 0.3s ease;
         }
 
         input:focus, select:focus {
@@ -118,14 +112,13 @@
             cursor: pointer;
             font-weight: bold;
             font-size: 15px;
-            transition: all 0.2s ease;
         }
 
         .btn { background: var(--accent-color); color: white; margin-right: 10px; }
-        .btn:hover { background: #2563eb; transform: translateY(-1px); }
+        .btn:hover { background: #2563eb; }
         
         .btn-success { background: var(--success-color); color: white; width: 100%; margin-top: 15px; }
-        .btn-success:hover { background: #059669; transform: translateY(-1px); }
+        .btn-success:hover { background: #059669; }
 
         .delete-btn {
             background-color: rgba(239, 68, 68, 0.15);
@@ -134,10 +127,6 @@
             padding: 6px 12px;
             font-size: 13px;
             border-radius: 6px;
-        }
-        .delete-btn:hover {
-            background-color: var(--danger-color);
-            color: white;
         }
 
         .table-responsive {
@@ -165,7 +154,6 @@
             position: sticky;
             top: 0;
             font-weight: 600;
-            z-index: 10;
         }
 
         tr:nth-child(even) { background-color: #1a2232; }
@@ -178,12 +166,9 @@
             margin: 8px 0;
             border-radius: 8px;
             border-left: 5px solid #fbbf24;
-            font-size: 14px;
-            font-weight: 500;
         }
         .low { color: var(--danger-color); font-weight: bold; }
 
-        /* إطار عرض صورة المنتج الكبيرة */
         .product-preview-img {
             max-width: 100%;
             max-height: 180px;
@@ -192,10 +177,8 @@
             border: 1px solid var(--border-color);
             margin-top: 15px;
             display: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
 
-        /* تنسيق الصور المصغرة داخل الجدول */
         .thumb-img {
             width: 45px;
             height: 45px;
@@ -297,7 +280,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // القائمة النظيفة الخالية تماماً من علامات التنصيص لتتطابق برمجياً مع الـ ID
     const defaultProducts = [
         { id: "1", name: 'sneakers midium quality', qty: 24, pu: 75 },
         { id: "2", name: 'sneakers Low quality', qty: 20, pu: 62 },
@@ -326,12 +308,8 @@
     function init(){
         db.ref("products").on("value", s => {
             products = s.val() || [];
-            
-            // تنظيف تلقائي صارم لأي مخلفات قديمة في الفايربيس تحتوي على علامات تنصيص
-            let hasOldData = products.some(p => p.name.includes('"'));
-            
-            if(products.length === 0 || hasOldData) {
-                products = JSON.parse(JSON.stringify(defaultProducts));
+            if(products.length === 0) {
+                products = [...defaultProducts];
                 db.ref("products").set(products);
             }
             render();
@@ -345,7 +323,7 @@
         });
     }
 
-    // ربط صريح ومستقر لمسار الصورة بالـ ID الفردي للمنتج
+    // تعديل المسار ليطابق الحروف الكبيرة Images و الامتداد الكبير PNG
     function handleProductChange() {
         const selectEl = document.getElementById("productSelect");
         const costInput = document.getElementById("costPriceInput");
@@ -356,7 +334,7 @@
         
         if (p) {
             costInput.value = p.pu;
-            previewImg.src = `images/${p.id}.png`; 
+            previewImg.src = `Images/${p.id}.PNG`; 
             previewImg.style.display = "block";
         } else {
             costInput.value = "";
@@ -416,8 +394,9 @@
         let alertsHTML = "";
 
         products.forEach(p => {
+            // تعديل المسار هنا أيضاً لعرض الصور المصغرة بالجدول السفلي بشكل صحيح
             stockHTML += `<tr>
-                <td><img class="thumb-img" src="images/${p.id}.png" alt="Product"></td>
+                <td><img class="thumb-img" src="Images/${p.id}.PNG" alt="Product"></td>
                 <td style="text-align: left; padding-left: 20px;"><b>${p.name}</b></td>
                 <td><span style="color:#e5e7eb">${p.qty} pcs</span></td>
             </tr>`;
