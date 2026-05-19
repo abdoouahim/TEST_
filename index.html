@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Manager Pro - Standard Edition</title>
+    <title>Stock Manager Pro - Final Masterpiece</title>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -313,6 +313,7 @@
                 db.ref("products").set(products);
             }
             render();
+            // تشغيل الدالة هنا يضمن ظهور صورة السلعة الأولى فور فتح الموقع تلقائياً
             handleProductChange(); 
         });
 
@@ -323,13 +324,15 @@
         });
     }
 
-    // إجبار المسار على قراءة الحروف الصغيرة: images و .png تماماً
     function handleProductChange() {
         const selectEl = document.getElementById("productSelect");
         const costInput = document.getElementById("costPriceInput");
         const previewImg = document.getElementById("productLivePreview");
         
         let id = selectEl.value;
+        // إذا لم يكن هناك قيمة محددة بعد، نأخذ المعرف الأول تلقائياً كحماية
+        if (!id && products.length > 0) id = products[0].id;
+        
         let p = products.find(x => x.id == id);
         
         if (p) {
