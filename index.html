@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock & Profit Optimizer - Premium Elegant Edition</title>
+    <title>Stock & Profit Optimizer - Professional Edition</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -142,7 +142,12 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
         }
 
-        /* تمييز حقل السعر التلقائي بلون مغاير وجذاب */
+        /* تنسيق متصفح التاريخ ليتوافق مع التصميم الداكن */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+
         .price-auto-highlight {
             background-color: #131a26 !important;
             color: #60a5fa !important;
@@ -292,6 +297,10 @@
     <div class="split-grid">
         <div class="card">
             <h3>Nouvelle Vente</h3>
+            
+            <label for="saleDateInput">Date de la vente :</label>
+            <input type="date" id="saleDateInput">
+
             <label for="productSelect">Sélectionner l'article :</label>
             <select id="productSelect" onchange="handleProductChange()"></select>
             
@@ -447,6 +456,9 @@
     init();
 
     function init(){
+        // ملء خانة التاريخ تلقائياً بتاريخ اليوم الحالي عند فتح المنظومة
+        document.getElementById("saleDateInput").value = new Date().toISOString().split("T")[0];
+
         db.ref("products").on("value", s => {
             let data = s.val() || [];
             if(data.length === 0) {
@@ -587,15 +599,18 @@
     }
 
     function addSale(){
+        const dateInput = document.getElementById("saleDateInput");
         const selectEl = document.getElementById("productSelect");
         const priceEl = document.getElementById("salePriceInput");
         const qtyEl = document.getElementById("saleQtyInput");
 
+        let chosenDate = dateInput.value;
         let id = selectEl.value;
         let p = products.find(x => x && x.id == id);
         let q = Number(qtyEl.value);
         let price = Number(priceEl.value);
 
+        if(!chosenDate) return alert("Veuillez sélectionner une date valide.");
         if(!p) return alert("Sélectionnez un produit valide.");
         if(q <= 0 || price <= 0) return alert("Entrez une quantité et un prix valides.");
         if(q > p.qty) return alert(`Stock insuffisant ! Il reste ${p.qty} pcs.`);
@@ -603,7 +618,7 @@
         p.qty -= q;
 
         let sale = {
-            date: new Date().toISOString().split("T")[0],
+            date: chosenDate, // اعتماد التاريخ المختار ديناميكياً بدلاً من التثبيت البرمجي
             productName: p.name,
             qty: q,
             ca: price * q,
@@ -686,7 +701,6 @@
         });
         salesTableBody.innerHTML = salesHTML;
 
-        // تحديث القوائم المنسدلة وعرض سعر المنتج بوضوح داخل حقول الـ select
         const productSelect = document.getElementById("productSelect");
         const reStockSelect = document.getElementById("reStockSelect");
         
@@ -695,7 +709,6 @@
         
         let selectOptions = products.map(p => {
             if(!p) return "";
-            // استبدال كمية المخزون وعرض ثمن شراء السلعة الافتراضي بالدرهم بشكل منظم وجذاب
             return `<option value="${p.id}">${p.name} (Prix: ${p.pu.toFixed(2)} DH)</option>`;
         }).join("");
         
