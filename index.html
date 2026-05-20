@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock & Profit Optimizer - Hover Analytics Edition</title>
+    <title>Stock & Profit Optimizer - Secure Elegant Edition</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -234,7 +234,6 @@
         tr:nth-child(even) { background-color: #1a2232; }
         tr:hover { background-color: #222f44; }
 
-        /* جعل النصوص الحساسة التي نمرر الفأرة فوقها تبدو كأزرار تفاعلية */
         .product-name-highlight {
             color: #ffffff !important;
             font-weight: 700 !important;
@@ -245,8 +244,8 @@
             padding: 4px 8px;
             border-radius: 6px;
             transition: background 0.2s ease;
+            display: inline-block;
         }
-        /* تلميح بصري ناعم عند تمرير الفأرة فوق الاسم */
         .product-name-highlight:hover {
             background: rgba(59, 130, 246, 0.2);
             color: #60a5fa !important;
@@ -403,7 +402,7 @@
     </div>
 
     <div class="card">
-        <h3>Ajouter un Nouveau Produit</h3>
+        <h3>Ajouter un Nouveau Prodit</h3>
         <label for="newProductName">Nom du produit :</label>
         <input type="text" id="newProductName" placeholder="Ex: sandals Adidas Luxury">
         
@@ -542,10 +541,10 @@
         }
     }
 
-    // دالة التمرير الذكية: تقوم بتحديث معاينة الصورة الكبيرة مؤقتاً عند الوقوف فوق اسم المنتج
+    // صياغة أمنية ذكية ومضمونة تمنع أي تجميد للكود أثناء حوم الفأرة
     function handleProductHover(productId) {
         const previewImg = document.getElementById("productLivePreview");
-        if (productId) {
+        if (productId && products.some(x => x && x.id == productId)) {
             previewImg.src = `images/${productId}.png`;
         }
     }
@@ -788,21 +787,24 @@
 
         products.forEach(p => {
             if(!p) return;
-            // ربط أحداث الماوس المتقدمة (onmouseenter عند الدخول و onmouseleave عند الخروج) بأسماء السلع في الجدول السفلي
+            // التحقق والحماية من الكائنات الفارغة
+            let pId = p.id ? String(p.id) : "";
+            let pName = p.name ? String(p.name) : "";
+
             stockHTML += `<tr>
-                <td><img class="thumb-img" src="images/${p.id}.png" alt="Product" onerror="this.style.visibility='hidden'"></td>
+                <td><img class="thumb-img" src="images/${pId}.png" alt="Product" onerror="this.style.visibility='hidden'"></td>
                 <td style="text-align: left; padding-left: 20px;">
                     <span class="product-name-highlight" 
-                          onmouseenter="handleProductHover('${p.id}')" 
+                          onmouseenter="handleProductHover('${pId}')" 
                           onmouseleave="handleProductChange()">
-                        ${p.name}
+                        ${pName}
                     </span>
                 </td>
                 <td><span style="color:#e5e7eb; font-weight: 600;">${p.qty} pcs</span></td>
             </tr>`;
             
             if(p.qty <= 5){
-                alertsHTML += `<div class='alert'>Stock faible: <span class='low'>${p.name} (${p.qty} pcs)</span></div>`;
+                alertsHTML += `<div class='alert'>Stock faible: <span class='low'>${pName} (${p.qty} pcs)</span></div>`;
             }
         });
 
@@ -818,7 +820,6 @@
             const escapedKey = String(s.key);
             const escapedName = s.productName.replace(/['"]/g, '\\$&');
 
-            // ربط التمرير بجدول المبيعات اليومية أيضاً لراحة تامة في التصفح البصري
             let pMatch = products.find(x => x && x.name === s.productName);
             let hoverAttributes = pMatch ? `onmouseenter="handleProductHover('${pMatch.id}')" onmouseleave="handleProductChange()"` : "";
 
