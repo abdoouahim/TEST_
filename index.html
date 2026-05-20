@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock & Profit Optimizer - Stable Edition</title>
+    <title>Stock & Profit Optimizer - Elegant Edition</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -22,14 +26,17 @@
             --danger-color: #ef4444;  
             --border-color: #243145;  
             --warning-color: #f59e0b;
+            /* الخط الأساسي الجديد الأنيق */
+            --main-font: 'Plus Jakarta Sans', 'Inter', sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: var(--main-font);
             background-color: var(--body-bg);
             margin: 0;
             padding: 30px 15px;
             color: var(--primary-text);
+            -webkit-font-smoothing: antialiased;
         }
 
         .container {
@@ -38,25 +45,28 @@
         }
 
         h2.main-title {
+            font-family: var(--main-font);
             text-align: center;
             color: #ffffff;
-            font-size: 32px;
+            font-size: 34px;
             margin-bottom: 25px;
-            font-weight: 700;
-            letter-spacing: 1px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
             text-transform: uppercase;
-            background: linear-gradient(45deg, #3b82f6, #10b981);
+            background: linear-gradient(135deg, #60a5fa, #34d399);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         h3 {
+            font-family: var(--main-font);
             margin-top: 0;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 12px;
             color: #ffffff;
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
         }
 
         .card {
@@ -79,17 +89,19 @@
 
         .stat-card {
             background: #1e2533;
-            padding: 15px 20px;
-            border-radius: 10px;
+            padding: 18px 20px;
+            border-radius: 12px;
             border-left: 4px solid var(--accent-color);
+            transition: transform 0.2s;
         }
+        .stat-card:hover { transform: translateY(-2px); }
         .stat-card.success { border-left-color: var(--success-color); }
         .stat-card.danger { border-left-color: var(--danger-color); }
 
-        .stat-title { font-size: 12px; color: var(--secondary-text); text-transform: uppercase; font-weight: 600; }
-        .stat-value { font-size: 22px; font-weight: 700; margin-top: 5px; color: #ffffff; }
+        .stat-title { font-size: 11px; color: var(--secondary-text); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+        .stat-value { font-size: 24px; font-weight: 800; margin-top: 5px; color: #ffffff; }
 
-        /* الجزء المتقابل علوياً */
+        /* التوزيع الهندسي المتقابل */
         .split-grid {
             display: grid;
             grid-template-columns: 1fr 1.6fr; 
@@ -105,15 +117,16 @@
 
         label {
             display: block;
-            margin: 12px 0 6px;
-            font-weight: 600;
+            margin: 14px 0 6px;
+            font-weight: 700;
             font-size: 13px;
             color: var(--secondary-text);
         }
 
         input, select {
+            font-family: var(--main-font);
             width: 100%;
-            padding: 12px;
+            padding: 12px 14px;
             margin-bottom: 5px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -121,6 +134,7 @@
             font-size: 15px;
             background-color: #1f293d;
             color: #ffffff;
+            transition: all 0.2s ease;
         }
 
         input:focus, select:focus {
@@ -133,15 +147,16 @@
             background-color: #131a26;
             color: #e5e7eb;
             border-style: dashed;
-            font-weight: bold;
+            font-weight: 700;
         }
 
         button {
+            font-family: var(--main-font);
             padding: 12px 24px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 700;
             font-size: 15px;
             transition: all 0.2s ease;
         }
@@ -162,6 +177,7 @@
         .btn-danger:hover { background: #dc2626; }
 
         .delete-btn {
+            font-family: var(--main-font);
             background-color: rgba(239, 68, 68, 0.15);
             color: var(--danger-color);
             border: 1px solid rgba(239, 68, 68, 0.3);
@@ -169,6 +185,7 @@
             font-size: 13px;
             border-radius: 6px;
         }
+        .delete-btn:hover { background-color: var(--danger-color); color: white; }
 
         .table-responsive {
             overflow-x: auto;
@@ -194,41 +211,53 @@
             color: #ffffff;
             position: sticky;
             top: 0;
-            font-weight: 600;
+            font-weight: 700;
             z-index: 10;
         }
 
         tr:nth-child(even) { background-color: #1a2232; }
         tr:hover { background-color: #222f44; }
 
+        /* التنسيق الجذاب والأنيق لأسماء المنتجات داخل الجداول */
+        .product-name-highlight {
+            color: #ffffff !important;
+            font-weight: 700 !important;
+            font-size: 15px;
+            letter-spacing: 0.3px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
         .alert {
+            font-family: var(--main-font);
             background: #2c2416;
             color: #fcd34d;
             padding: 12px;
             margin: 8px 0;
             border-radius: 8px;
             border-left: 5px solid #fbbf24;
+            font-weight: 600;
         }
-        .low { color: var(--danger-color); font-weight: bold; }
+        .low { color: var(--danger-color); font-weight: 800; }
 
         .product-preview-img {
             max-width: 100%;
-            max-height: 180px;
+            max-height: 190px;
             object-fit: contain;
-            border-radius: 10px;
+            border-radius: 12px;
             border: 1px solid var(--border-color);
             margin-top: 15px;
             display: none; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.6);
         }
 
         .thumb-img {
-            width: 45px;
-            height: 45px;
+            width: 48px;
+            height: 48px;
             object-fit: cover;
-            border-radius: 6px;
+            border-radius: 8px;
             border: 1px solid var(--border-color);
             vertical-align: middle;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
     </style>
 </head>
@@ -456,7 +485,6 @@
         
         if (p && p.id) {
             costInput.value = p.pu;
-            // قراءة مستقرة ومباشرة من مجلد المجلد المحلي المسمى images بصيغة حروف صغيرة .png وبناءً على رقم الـ id
             previewImg.src = `images/${p.id}.png`; 
         } else {
             costInput.value = "";
@@ -606,7 +634,7 @@
         let html = "";
         expenses.forEach(e => {
             html += `<tr>
-                <td style="text-align:left; font-weight:600;">${e.description}</td>
+                <td style="text-align:left; font-weight:700; color: #ffffff;">${e.description}</td>
                 <td style="color:var(--danger-color); font-weight:bold;">${e.amount.toFixed(2)} DH</td>
                 <td><button class="delete-btn" onclick="deleteExpense('${e.key}')">Supprimer</button></td>
             </tr>`;
@@ -625,8 +653,8 @@
             if(!p) return;
             stockHTML += `<tr>
                 <td><img class="thumb-img" src="images/${p.id}.png" alt="Product" onerror="this.style.visibility='hidden'"></td>
-                <td style="text-align: left; padding-left: 20px;"><b>${p.name}</b></td>
-                <td><span style="color:#e5e7eb">${p.qty} pcs</span></td>
+                <td style="text-align: left; padding-left: 20px;"><span class="product-name-highlight">${p.name}</span></td>
+                <td><span style="color:#e5e7eb; font-weight: 600;">${p.qty} pcs</span></td>
             </tr>`;
             
             if(p.qty <= 5){
@@ -648,16 +676,15 @@
 
             salesHTML += `<tr>
                 <td>${s.date}</td>
-                <td style="text-align:left; font-weight:600;">${s.productName}</td>
-                <td>${s.qty}</td>
-                <td>${s.ca.toFixed(2)}</td>
-                <td style="color: var(--success-color); font-weight: bold;">+${s.profit.toFixed(2)}</td>
+                <td style="text-align:left;"><span class="product-name-highlight">${s.productName}</span></td>
+                <td style="font-weight: 600;">${s.qty}</td>
+                <td style="font-weight: 600;">${s.ca.toFixed(2)}</td>
+                <td style="color: var(--success-color); font-weight: 800;">+${s.profit.toFixed(2)}</td>
                 <td><button class="delete-btn" onclick="deleteSale('${escapedKey}', '${escapedName}', ${s.qty})">Supprimer</button></td>
             </tr>`;
         });
         salesTableBody.innerHTML = salesHTML;
 
-        // تحديث القوائم المنسدلة
         const productSelect = document.getElementById("productSelect");
         const reStockSelect = document.getElementById("reStockSelect");
         
