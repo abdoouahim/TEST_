@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock & Profit Optimizer - Split History Edition</title>
+    <title>Stock & Profit Optimizer - Ultimate Advanced Edition</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -101,7 +101,6 @@
         .stat-title { font-size: 11px; color: var(--secondary-text); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
         .stat-value { font-size: 24px; font-weight: 800; margin-top: 5px; color: #ffffff; }
 
-        /* الشاشة العلوية الرئيسية: مقسمة أفقياً لثلاثة أقسام متقابلة ومثالية بصرياً */
         .split-grid {
             display: grid;
             grid-template-columns: 1fr 1.2fr 1.2fr; 
@@ -263,6 +262,17 @@
         .product-name-highlight:hover {
             background: rgba(59, 130, 246, 0.2);
             color: #60a5fa !important;
+        }
+
+        .seller-badge {
+            background-color: #1e293b;
+            color: #f59e0b;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            letter-spacing: 0.3px;
         }
 
         .alert {
@@ -819,10 +829,24 @@
         qtyEl.value = "";
     }
 
+    // تعديل متطور للعملية يتضمن ميزة تعديل يوم وتاريخ إدخال البيع لحل أي خطأ
     function editSale(firebaseKey, productName, oldQuantity) {
         const prod = products.find(p => p && p.name === productName);
         if (!prod) return alert("Produit introuvable.");
 
+        let currentSale = sales.find(s => s.key === firebaseKey);
+        if (!currentSale) return alert("Vente introuvable.");
+
+        // 1. طلب تعديل التاريخ المختار للعملية (الميزة الجديدة المطلوبة)
+        let oldDate = currentSale.date || new Date().toISOString().split("T")[0];
+        let newDate = prompt("Modifier la date de la vente (Format: YYYY-MM-DD) :", oldDate);
+        if (newDate === null) return;
+        newDate = newDate.trim();
+        if (newDate === "" || !/^\d{4}-\d{2}-\d{2}$/.test(newDate)) {
+            return alert("Format de date invalide ! Veuillez utiliser la formule YYYY-MM-DD.");
+        }
+
+        // 2. طلب الكمية الجديدة
         let newQtyStr = prompt(`Modifier la quantité pour ${productName} :`, oldQuantity);
         if (newQtyStr === null) return;
         let newQty = Number(newQtyStr);
@@ -833,14 +857,15 @@
             return alert(`Stock insuffisant ! Stock max : ${availableStockCapacity} pcs.`);
         }
 
-        let currentSale = sales.find(s => s.key === firebaseKey);
-        let oldPrice = currentSale ? (currentSale.ca / oldQuantity).toFixed(2) : 0;
+        // 3. طلب السعر الجديد
+        let oldPrice = (currentSale.ca / oldQuantity).toFixed(2);
         let newPriceStr = prompt("Modifier le prix de vente unitaire (DH) :", oldPrice);
         if (newPriceStr === null) return;
         let newPrice = Number(newPriceStr);
         if (isNaN(newPrice) || newPrice <= 0) return alert("Prix invalide.");
 
-        let oldSeller = currentSale ? currentSale.vendeur : "Abi";
+        // 4. طلب تعديل اسم الشخص البائع
+        let oldSeller = currentSale.vendeur || "Abi";
         let newSeller = prompt("Modifier le nom du vendeur (Abi / Abderrahmane & ayoub) :", oldSeller);
         if (newSeller === null) return;
         newSeller = newSeller.trim();
@@ -848,10 +873,11 @@
             return alert("Nom invalide ! Écrire 'Abi' ou 'Abderrahmane & ayoub'.");
         }
 
+        // موازنة كميات الرفوف
         prod.qty = availableStockCapacity - newQty;
 
         let updatedSale = {
-            date: currentSale.date,
+            date: newDate, // حفظ التاريخ الجديد بنجاح في السيرفر
             vendeur: newSeller,
             productName: productName,
             qty: newQty,
@@ -862,7 +888,7 @@
         db.ref('sales').child(firebaseKey).set(updatedSale)
             .then(() => {
                 db.ref('products').set(products);
-                alert("Vente modifiée avec succès !");
+                alert("Vente mise à jour avec succès !");
             });
     }
 
@@ -892,7 +918,6 @@
         tableBody.innerHTML = html;
     }
 
-    // تصدير مخصص حسب اسم الشخص البائع فقط لحسابات دقيقة
     function exportSellerExcel(sellerName) {
         let sellerSales = sales.filter(s => {
             let v = s.vendeur || "Abi";
@@ -930,7 +955,7 @@
             doc.text(`${s.date} | ${s.productName} | Qte: ${s.qty} | Profit: ${s.profit.toFixed(2)} DH`, 14, y);
             y += 10;
         });
-        doc.save(`Rapport_Ventes_${sellerName.replace(/ & /g, '_')}.pdf`);
+        doc.save("Rapport_Ventes_Shared.pdf");
     }
 
     function render(){
@@ -965,7 +990,6 @@
         stockTableBody.innerHTML = stockHTML;
         alerts.innerHTML = alertsHTML || "Aucun problème de stock";
 
-        // تفكيك وتوزيع العمليات على الجدولين المستقلين علوياً حياً وفورياً
         const abiSalesTableBody = document.querySelector("#abiSalesTable tbody");
         const teamSalesTableBody = document.querySelector("#teamSalesTable tbody");
         
@@ -1000,7 +1024,6 @@
                 </td>
             </tr>`;
 
-            // الفرز المباشر لكل عملية لتدخل جدول صاحبها فوراً
             if (sellerDisplay === "Abi") {
                 abiHTML += rowHTML;
             } else {
