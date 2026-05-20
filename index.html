@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock & Profit Optimizer - Advanced Edit Edition</title>
+    <title>Stock & Profit Optimizer - Split History Edition</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,7 +41,7 @@
         }
 
         .container {
-            max-width: 1250px;
+            max-width: 1350px;
             margin: auto;
         }
 
@@ -101,10 +101,11 @@
         .stat-title { font-size: 11px; color: var(--secondary-text); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
         .stat-value { font-size: 24px; font-weight: 800; margin-top: 5px; color: #ffffff; }
 
+        /* الشاشة العلوية الرئيسية: مقسمة أفقياً لثلاثة أقسام متقابلة ومثالية بصرياً */
         .split-grid {
             display: grid;
-            grid-template-columns: 1fr 1.5fr; 
-            gap: 20px;
+            grid-template-columns: 1fr 1.2fr 1.2fr; 
+            gap: 15px;
             margin-bottom: 20px;
         }
 
@@ -115,8 +116,14 @@
             margin-bottom: 20px;
         }
 
+        @media (max-width: 1100px) {
+            .split-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 950px) {
-            .split-grid, .dashboard-grid, .charts-grid {
+            .dashboard-grid, .charts-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -174,7 +181,7 @@
             transition: all 0.2s ease;
         }
 
-        .btn { background: var(--accent-color); color: white; margin-right: 10px; }
+        .btn { background: var(--accent-color); color: white; margin-right: 5px; padding: 8px 14px; font-size: 13px;}
         .btn:hover { background: #2563eb; }
         
         .btn-success { background: var(--success-color); color: white; width: 100%; margin-top: 15px; }
@@ -189,16 +196,15 @@
         .btn-danger { background: var(--danger-color); color: white; width: 100%; margin-top: 15px; }
         .btn-danger:hover { background: #dc2626; }
 
-        /* تنسيق أزرار الإجراءات داخل الجدول لتبدو أكثر احترافية */
         .delete-btn {
             font-family: var(--main-font);
             background-color: rgba(239, 68, 68, 0.12);
             color: var(--danger-color);
             border: 1px solid rgba(239, 68, 68, 0.25);
-            padding: 5px 10px;
-            font-size: 12px;
-            border-radius: 6px;
-            margin-left: 5px;
+            padding: 4px 8px;
+            font-size: 11px;
+            border-radius: 5px;
+            margin-left: 3px;
         }
         .delete-btn:hover { background-color: var(--danger-color); color: white; }
 
@@ -207,15 +213,15 @@
             background-color: rgba(59, 130, 246, 0.12);
             color: #60a5fa;
             border: 1px solid rgba(59, 130, 246, 0.25);
-            padding: 5px 10px;
-            font-size: 12px;
-            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 11px;
+            border-radius: 5px;
         }
         .edit-action-btn:hover { background-color: var(--accent-color); color: white; }
 
         .table-responsive {
             overflow-x: auto;
-            max-height: 400px;
+            max-height: 380px;
             overflow-y: auto;
         }
 
@@ -226,9 +232,9 @@
         }
 
         th, td {
-            padding: 14px 10px;
+            padding: 10px 6px;
             border-bottom: 1px solid var(--border-color);
-            font-size: 14px;
+            font-size: 13px;
             vertical-align: middle;
         }
 
@@ -247,29 +253,16 @@
         .product-name-highlight {
             color: #ffffff !important;
             font-weight: 700 !important;
-            font-size: 15px;
-            letter-spacing: 0.3px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            font-size: 14px;
             cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 6px;
+            padding: 3px 6px;
+            border-radius: 5px;
             transition: background 0.2s ease;
             display: inline-block;
         }
         .product-name-highlight:hover {
             background: rgba(59, 130, 246, 0.2);
             color: #60a5fa !important;
-        }
-
-        .seller-badge {
-            background-color: #1e293b;
-            color: #f59e0b;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 700;
-            border: 1px solid rgba(245, 158, 11, 0.25);
-            letter-spacing: 0.3px;
         }
 
         .alert {
@@ -286,7 +279,7 @@
 
         .product-preview-img {
             max-width: 100%;
-            max-height: 190px;
+            max-height: 180px;
             object-fit: contain;
             border-radius: 12px;
             border: 1px solid var(--border-color);
@@ -296,13 +289,12 @@
         }
 
         .thumb-img {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             object-fit: cover;
             border-radius: 8px;
             border: 1px solid var(--border-color);
             vertical-align: middle;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
     </style>
 </head>
@@ -366,17 +358,39 @@
         </div>
 
         <div class="card">
-            <h3>Historique des Ventes</h3>
-            <div style="margin-bottom: 15px;">
-                <button class="btn" onclick="exportExcel()">Exporter Excel</button>
-                <button class="btn" onclick="exportPDF()">Exporter PDF</button>
+            <h3>Historique de Abi</h3>
+            <div style="margin-bottom: 12px; display: flex;">
+                <button class="btn" onclick="exportSellerExcel('Abi')">Excel</button>
+                <button class="btn" onclick="exportSellerPDF('Abi')">PDF</button>
             </div>
             <div class="table-responsive">
-                <table id="salesTable">
+                <table id="abiSalesTable">
                     <thead>
                         <tr>
                             <th>Date</th>
-                            <th>Vendeur</th>
+                            <th>Produit</th>
+                            <th>Qté</th>
+                            <th>CA</th>
+                            <th>Profit</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Historique de Abderrahmane & ayoub</h3>
+            <div style="margin-bottom: 12px; display: flex;">
+                <button class="btn" onclick="exportSellerExcel('Abderrahmane & ayoub')">Excel</button>
+                <button class="btn" onclick="exportSellerPDF('Abderrahmane & ayoub')">PDF</button>
+            </div>
+            <div class="table-responsive">
+                <table id="teamSalesTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
                             <th>Produit</th>
                             <th>Qté</th>
                             <th>CA</th>
@@ -805,44 +819,37 @@
         qtyEl.value = "";
     }
 
-    // خاصية التعديل الشاملة والمتقدمة الجديدة لتعديل الكميات والأسعار والأسماء مع موازنة السيرفر حياً
     function editSale(firebaseKey, productName, oldQuantity) {
         const prod = products.find(p => p && p.name === productName);
-        if (!prod) return alert("Produit introuvable dans le stock.");
+        if (!prod) return alert("Produit introuvable.");
 
-        // 1. طلب الكمية الجديدة
         let newQtyStr = prompt(`Modifier la quantité pour ${productName} :`, oldQuantity);
-        if (newQtyStr === null) return; // إلغاء العملية
+        if (newQtyStr === null) return;
         let newQty = Number(newQtyStr);
-        if (isNaN(newQty) || newQty <= 0) return alert("Veuillez entrer une quantité valide.");
+        if (isNaN(newQty) || newQty <= 0) return alert("Quantité invalide.");
 
-        // التحقق من كفاية المخزون (مع احتساب القطع القديمة المبيوعة مسبقاً)
         let availableStockCapacity = prod.qty + Number(oldQuantity);
         if (newQty > availableStockCapacity) {
-            return alert(`Stock insuffisant ! Stock max disponible : ${availableStockCapacity} pcs.`);
+            return alert(`Stock insuffisant ! Stock max : ${availableStockCapacity} pcs.`);
         }
 
-        // 2. طلب السعر الجديد
         let currentSale = sales.find(s => s.key === firebaseKey);
         let oldPrice = currentSale ? (currentSale.ca / oldQuantity).toFixed(2) : 0;
         let newPriceStr = prompt("Modifier le prix de vente unitaire (DH) :", oldPrice);
         if (newPriceStr === null) return;
         let newPrice = Number(newPriceStr);
-        if (isNaN(newPrice) || newPrice <= 0) return alert("Veuillez entrer un prix valide.");
+        if (isNaN(newPrice) || newPrice <= 0) return alert("Prix invalide.");
 
-        // 3. طلب تعديل اسم الشخص البائع
         let oldSeller = currentSale ? currentSale.vendeur : "Abi";
         let newSeller = prompt("Modifier le nom du vendeur (Abi / Abderrahmane & ayoub) :", oldSeller);
         if (newSeller === null) return;
         newSeller = newSeller.trim();
         if (newSeller !== "Abi" && newSeller !== "Abderrahmane & ayoub") {
-            return alert("Nom invalide ! Veuillez écrire exactement 'Abi' ou 'Abderrahmane & ayoub'.");
+            return alert("Nom invalide ! Écrire 'Abi' ou 'Abderrahmane & ayoub'.");
         }
 
-        // 4. موازنة كميات المخزون في الذاكرة الحية والسيرفر
         prod.qty = availableStockCapacity - newQty;
 
-        // 5. بناء الكائن المحدث للبيع
         let updatedSale = {
             date: currentSale.date,
             vendeur: newSeller,
@@ -852,7 +859,6 @@
             profit: (newPrice - prod.pu) * newQty
         };
 
-        // 6. الحفظ المباشر في عقدة الفايربيس وإعادة تحديث الواجهة والرسومات حياً
         db.ref('sales').child(firebaseKey).set(updatedSale)
             .then(() => {
                 db.ref('products').set(products);
@@ -884,6 +890,47 @@
             </tr>`;
         });
         tableBody.innerHTML = html;
+    }
+
+    // تصدير مخصص حسب اسم الشخص البائع فقط لحسابات دقيقة
+    function exportSellerExcel(sellerName) {
+        let sellerSales = sales.filter(s => {
+            let v = s.vendeur || "Abi";
+            if(v === "Ayoub" || v === "Abderrahmane") v = "Abderrahmane & ayoub";
+            return v === sellerName;
+        });
+        if(sellerSales.length === 0) return alert("Pas de données à exporter.");
+        let wb = XLSX.utils.book_new();
+        let ws = XLSX.utils.json_to_sheet(sellerSales.map(s => ({
+            Date: s.date,
+            Produit: s.productName,
+            Quantite: s.qty,
+            CA: s.ca,
+            Profit: s.profit
+        })));
+        XLSX.utils.book_append_sheet(wb, ws, "Ventes");
+        XLSX.writeFile(wb, `Rapport_Ventes_${sellerName.replace(/ & /g, '_')}.xlsx`);
+    }
+
+    function exportSellerPDF(sellerName) {
+        let sellerSales = sales.filter(s => {
+            let v = s.vendeur || "Abi";
+            if(v === "Ayoub" || v === "Abderrahmane") v = "Abderrahmane & ayoub";
+            return v === sellerName;
+        });
+        if(sellerSales.length === 0) return alert("Pas de données à exporter.");
+        const { jsPDF } = window.jspdf;
+        let doc = new jsPDF();
+        doc.setFontSize(16);
+        doc.text(`Rapport des Ventes - ${sellerName}`, 14, 15);
+        doc.setFontSize(11);
+        let y = 25;
+        sellerSales.forEach(s => {
+            if(y > 280) { doc.addPage(); y = 20; }
+            doc.text(`${s.date} | ${s.productName} | Qte: ${s.qty} | Profit: ${s.profit.toFixed(2)} DH`, 14, y);
+            y += 10;
+        });
+        doc.save(`Rapport_Ventes_${sellerName.replace(/ & /g, '_')}.pdf`);
     }
 
     function render(){
@@ -918,23 +965,27 @@
         stockTableBody.innerHTML = stockHTML;
         alerts.innerHTML = alertsHTML || "Aucun problème de stock";
 
-        const salesTableBody = document.querySelector("#salesTable tbody");
-        let salesHTML = "";
+        // تفكيك وتوزيع العمليات على الجدولين المستقلين علوياً حياً وفورياً
+        const abiSalesTableBody = document.querySelector("#abiSalesTable tbody");
+        const teamSalesTableBody = document.querySelector("#teamSalesTable tbody");
+        
+        let abiHTML = "";
+        let teamHTML = "";
 
         sales.sort((a,b) => new Date(b.date) - new Date(a.date));
 
         sales.forEach(s => {
             const escapedKey = String(s.key);
             const escapedName = s.productName.replace(/['"]/g, '\\$&');
+            
             let sellerDisplay = s.vendeur || "Abi";
+            if(sellerDisplay === "Ayoub" || sellerDisplay === "Abderrahmane") sellerDisplay = "Abderrahmane & ayoub";
 
             let pMatch = products.find(x => x && x.name === s.productName);
             let hoverAttributes = pMatch ? `onmouseenter="handleProductHover('${pMatch.id}')" onmouseleave="handleProductChange()"` : "";
 
-            // إدراج زر التعديل الإداري المتطور والجديد بجانب الحذف في الجدول
-            salesHTML += `<tr>
+            let rowHTML = `<tr>
                 <td>${s.date}</td>
-                <td><span class="seller-badge">${sellerDisplay}</span></td>
                 <td style="text-align:left;">
                     <span class="product-name-highlight" ${hoverAttributes}>
                         ${s.productName}
@@ -944,12 +995,21 @@
                 <td style="font-weight: 600;">${s.ca.toFixed(2)}</td>
                 <td style="color: var(--success-color); font-weight: 800;">+${s.profit.toFixed(2)}</td>
                 <td>
-                    <button class="edit-action-btn" onclick="editSale('${escapedKey}', '${escapedName}', ${s.qty})">Modifier</button>
-                    <button class="delete-btn" onclick="deleteSale('${escapedKey}', '${escapedName}', ${s.qty})">Supprimer</button>
+                    <button class="edit-action-btn" onclick="editSale('${escapedKey}', '${escapedName}', ${s.qty})">Mod</button>
+                    <button class="delete-btn" onclick="deleteSale('${escapedKey}', '${escapedName}', ${s.qty})">Supp</button>
                 </td>
             </tr>`;
+
+            // الفرز المباشر لكل عملية لتدخل جدول صاحبها فوراً
+            if (sellerDisplay === "Abi") {
+                abiHTML += rowHTML;
+            } else {
+                teamHTML += rowHTML;
+            }
         });
-        salesTableBody.innerHTML = salesHTML;
+        
+        abiSalesTableBody.innerHTML = abiHTML;
+        teamSalesTableBody.innerHTML = teamHTML;
 
         const productSelect = document.getElementById("productSelect");
         const reStockSelect = document.getElementById("reStockSelect");
