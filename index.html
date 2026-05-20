@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock & Profit Optimizer - Dual Seller Edition</title>
+    <title>Stock & Profit Optimizer - Advanced Edit Edition</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -80,7 +80,6 @@
             box-sizing: border-box;
         }
 
-        /* لوحة المؤشرات العلوية */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -102,15 +101,13 @@
         .stat-title { font-size: 11px; color: var(--secondary-text); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
         .stat-value { font-size: 24px; font-weight: 800; margin-top: 5px; color: #ffffff; }
 
-        /* التوزيع الهندسي المتقابل */
         .split-grid {
             display: grid;
-            grid-template-columns: 1fr 1.6fr; 
+            grid-template-columns: 1fr 1.5fr; 
             gap: 20px;
             margin-bottom: 20px;
         }
 
-        /* شبكة الإحصائيات المتجاورة */
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -192,16 +189,29 @@
         .btn-danger { background: var(--danger-color); color: white; width: 100%; margin-top: 15px; }
         .btn-danger:hover { background: #dc2626; }
 
+        /* تنسيق أزرار الإجراءات داخل الجدول لتبدو أكثر احترافية */
         .delete-btn {
             font-family: var(--main-font);
-            background-color: rgba(239, 68, 68, 0.15);
+            background-color: rgba(239, 68, 68, 0.12);
             color: var(--danger-color);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            padding: 6px 12px;
-            font-size: 13px;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            padding: 5px 10px;
+            font-size: 12px;
             border-radius: 6px;
+            margin-left: 5px;
         }
         .delete-btn:hover { background-color: var(--danger-color); color: white; }
+
+        .edit-action-btn {
+            font-family: var(--main-font);
+            background-color: rgba(59, 130, 246, 0.12);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+        .edit-action-btn:hover { background-color: var(--accent-color); color: white; }
 
         .table-responsive {
             overflow-x: auto;
@@ -371,7 +381,7 @@
                             <th>Qté</th>
                             <th>CA</th>
                             <th>Profit</th>
-                            <th>Action</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -601,7 +611,6 @@
         let productProfits = {};
         products.forEach(p => { productProfits[p.name] = 0; });
         
-        // فرز إحصائي دقيق ومباشر مبني على شخصين فقط
         let sellerProfits = { "Abi": 0, "Abderrahmane & ayoub": 0 };
 
         sales.forEach(s => {
@@ -609,7 +618,6 @@
                 productProfits[s.productName] += s.profit || 0;
             }
             let vName = s.vendeur || "Abi";
-            // نقل مبيعات التسميات المنفصلة القديمة تلقائياً إلى الحساب المشترك الجديد لمنع التشوه
             if(vName === "Ayoub" || vName === "Abderrahmane") vName = "Abderrahmane & ayoub";
             
             if (sellerProfits[vName] !== undefined) {
@@ -618,7 +626,6 @@
         });
         const profitData = products.map(p => productProfits[p.name] || 0);
 
-        // 1. مبيان المخزون
         if (stockChartInstance) {
             stockChartInstance.data.labels = labels;
             stockChartInstance.data.datasets[0].data = stockData;
@@ -641,7 +648,6 @@
             });
         }
 
-        // 2. مبيان أرباح المنتجات
         if (profitChartInstance) {
             profitChartInstance.data.labels = labels;
             profitChartInstance.data.datasets[0].data = profitData;
@@ -664,7 +670,6 @@
             });
         }
 
-        // 3. مبيان مقارنة الأرباح الثنائي الفخم للشريكين
         const sellerLabels = Object.keys(sellerProfits);
         const sellerData = Object.values(sellerProfits);
 
@@ -800,6 +805,61 @@
         qtyEl.value = "";
     }
 
+    // خاصية التعديل الشاملة والمتقدمة الجديدة لتعديل الكميات والأسعار والأسماء مع موازنة السيرفر حياً
+    function editSale(firebaseKey, productName, oldQuantity) {
+        const prod = products.find(p => p && p.name === productName);
+        if (!prod) return alert("Produit introuvable dans le stock.");
+
+        // 1. طلب الكمية الجديدة
+        let newQtyStr = prompt(`Modifier la quantité pour ${productName} :`, oldQuantity);
+        if (newQtyStr === null) return; // إلغاء العملية
+        let newQty = Number(newQtyStr);
+        if (isNaN(newQty) || newQty <= 0) return alert("Veuillez entrer une quantité valide.");
+
+        // التحقق من كفاية المخزون (مع احتساب القطع القديمة المبيوعة مسبقاً)
+        let availableStockCapacity = prod.qty + Number(oldQuantity);
+        if (newQty > availableStockCapacity) {
+            return alert(`Stock insuffisant ! Stock max disponible : ${availableStockCapacity} pcs.`);
+        }
+
+        // 2. طلب السعر الجديد
+        let currentSale = sales.find(s => s.key === firebaseKey);
+        let oldPrice = currentSale ? (currentSale.ca / oldQuantity).toFixed(2) : 0;
+        let newPriceStr = prompt("Modifier le prix de vente unitaire (DH) :", oldPrice);
+        if (newPriceStr === null) return;
+        let newPrice = Number(newPriceStr);
+        if (isNaN(newPrice) || newPrice <= 0) return alert("Veuillez entrer un prix valide.");
+
+        // 3. طلب تعديل اسم الشخص البائع
+        let oldSeller = currentSale ? currentSale.vendeur : "Abi";
+        let newSeller = prompt("Modifier le nom du vendeur (Abi / Abderrahmane & ayoub) :", oldSeller);
+        if (newSeller === null) return;
+        newSeller = newSeller.trim();
+        if (newSeller !== "Abi" && newSeller !== "Abderrahmane & ayoub") {
+            return alert("Nom invalide ! Veuillez écrire exactement 'Abi' ou 'Abderrahmane & ayoub'.");
+        }
+
+        // 4. موازنة كميات المخزون في الذاكرة الحية والسيرفر
+        prod.qty = availableStockCapacity - newQty;
+
+        // 5. بناء الكائن المحدث للبيع
+        let updatedSale = {
+            date: currentSale.date,
+            vendeur: newSeller,
+            productName: productName,
+            qty: newQty,
+            ca: newPrice * newQty,
+            profit: (newPrice - prod.pu) * newQty
+        };
+
+        // 6. الحفظ المباشر في عقدة الفايربيس وإعادة تحديث الواجهة والرسومات حياً
+        db.ref('sales').child(firebaseKey).set(updatedSale)
+            .then(() => {
+                db.ref('products').set(products);
+                alert("Vente modifiée avec succès !");
+            });
+    }
+
     function deleteSale(firebaseKey, productName, quantity) {
         if (confirm("En supprimant cette vente, les articles seront rajoutés au stock automatiquement. Confirmer ?")) {
             const prod = products.find(p => p && p.name === productName);
@@ -866,13 +926,12 @@
         sales.forEach(s => {
             const escapedKey = String(s.key);
             const escapedName = s.productName.replace(/['"]/g, '\\$&');
-            
             let sellerDisplay = s.vendeur || "Abi";
-            if(sellerDisplay === "Ayoub" || sellerDisplay === "Abderrahmane") sellerDisplay = "Abderrahmane & ayoub";
 
             let pMatch = products.find(x => x && x.name === s.productName);
             let hoverAttributes = pMatch ? `onmouseenter="handleProductHover('${pMatch.id}')" onmouseleave="handleProductChange()"` : "";
 
+            // إدراج زر التعديل الإداري المتطور والجديد بجانب الحذف في الجدول
             salesHTML += `<tr>
                 <td>${s.date}</td>
                 <td><span class="seller-badge">${sellerDisplay}</span></td>
@@ -884,7 +943,10 @@
                 <td style="font-weight: 600;">${s.qty}</td>
                 <td style="font-weight: 600;">${s.ca.toFixed(2)}</td>
                 <td style="color: var(--success-color); font-weight: 800;">+${s.profit.toFixed(2)}</td>
-                <td><button class="delete-btn" onclick="deleteSale('${escapedKey}', '${escapedName}', ${s.qty})">Supprimer</button></td>
+                <td>
+                    <button class="edit-action-btn" onclick="editSale('${escapedKey}', '${escapedName}', ${s.qty})">Modifier</button>
+                    <button class="delete-btn" onclick="deleteSale('${escapedKey}', '${escapedName}', ${s.qty})">Supprimer</button>
+                </td>
             </tr>`;
         });
         salesTableBody.innerHTML = salesHTML;
