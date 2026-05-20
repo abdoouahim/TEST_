@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock & Profit Optimizer - Analytics Edition</title>
+    <title>Stock & Profit Optimizer - Hover Analytics Edition</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -110,7 +110,7 @@
             margin-bottom: 20px;
         }
 
-        /* شبكة الإحصائيات المتجاورة أسفل الموقع */
+        /* شبكة الإحصائيات المتجاورة */
         .charts-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -234,12 +234,22 @@
         tr:nth-child(even) { background-color: #1a2232; }
         tr:hover { background-color: #222f44; }
 
+        /* جعل النصوص الحساسة التي نمرر الفأرة فوقها تبدو كأزرار تفاعلية */
         .product-name-highlight {
             color: #ffffff !important;
             font-weight: 700 !important;
             font-size: 15px;
             letter-spacing: 0.3px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+        /* تلميح بصري ناعم عند تمرير الفأرة فوق الاسم */
+        .product-name-highlight:hover {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa !important;
         }
 
         .alert {
@@ -476,7 +486,6 @@
     let sales = [];
     let expenses = [];
     
-    // متغيرات حفظ المبيانات لمنع تكرار الإنشاء وتحديث البيانات حية
     let stockChartInstance = null;
     let profitChartInstance = null;
 
@@ -495,7 +504,7 @@
             }
             render();
             handleProductChange(); 
-            updateAnalyticsCharts(); // تحديث المبيانات فور تغير المخزون
+            updateAnalyticsCharts(); 
         });
 
         db.ref("sales").on("value", s => {
@@ -503,7 +512,7 @@
             sales = Object.keys(data).map(k => ({...data[k], key: k}));
             calculateDashboard();
             render();
-            updateAnalyticsCharts(); // تحديث المبيانات فور تسجيل أي بيع جديد
+            updateAnalyticsCharts(); 
         });
 
         db.ref("expenses").on("value", s => {
@@ -533,6 +542,14 @@
         }
     }
 
+    // دالة التمرير الذكية: تقوم بتحديث معاينة الصورة الكبيرة مؤقتاً عند الوقوف فوق اسم المنتج
+    function handleProductHover(productId) {
+        const previewImg = document.getElementById("productLivePreview");
+        if (productId) {
+            previewImg.src = `images/${productId}.png`;
+        }
+    }
+
     function calculateDashboard() {
         let totalCA = 0;
         let totalProfitMargin = 0;
@@ -554,14 +571,12 @@
         document.getElementById("statNetProfit").innerText = netProfit.toFixed(2) + " DH";
     }
 
-    // دالة بناء وتحديث المبيانات الإحصائية حية وتلقائياً
     function updateAnalyticsCharts() {
         if (products.length === 0) return;
 
         const labels = products.map(p => p.name);
         const stockData = products.map(p => p.qty);
 
-        // حساب الأرباح لكل منتج من سجل المبيعات الفعلي
         let productProfits = {};
         products.forEach(p => { productProfits[p.name] = 0; });
         sales.forEach(s => {
@@ -571,7 +586,6 @@
         });
         const profitData = products.map(p => productProfits[p.name] || 0);
 
-        // 1. مبيان المخزون
         if (stockChartInstance) {
             stockChartInstance.data.labels = labels;
             stockChartInstance.data.datasets[0].data = stockData;
@@ -602,7 +616,6 @@
             });
         }
 
-        // 2. مبيان الأرباح
         if (profitChartInstance) {
             profitChartInstance.data.labels = labels;
             profitChartInstance.data.datasets[0].data = profitData;
@@ -691,7 +704,7 @@
         let desc = descInput.value.trim();
         let amount = Number(amountInput.value);
 
-        if(desc === "" || amount <= 0) return alert("Veuillez remplir les champs de dépenses correctamente.");
+        if(desc === "" || amount <= 0) return alert("Veuillez remplir les champs de dépenses correctement.");
 
         let expense = { description: desc, amount: amount };
         db.ref("expenses").push(expense).then(() => {
@@ -775,9 +788,16 @@
 
         products.forEach(p => {
             if(!p) return;
+            // ربط أحداث الماوس المتقدمة (onmouseenter عند الدخول و onmouseleave عند الخروج) بأسماء السلع في الجدول السفلي
             stockHTML += `<tr>
                 <td><img class="thumb-img" src="images/${p.id}.png" alt="Product" onerror="this.style.visibility='hidden'"></td>
-                <td style="text-align: left; padding-left: 20px;"><span class="product-name-highlight">${p.name}</span></td>
+                <td style="text-align: left; padding-left: 20px;">
+                    <span class="product-name-highlight" 
+                          onmouseenter="handleProductHover('${p.id}')" 
+                          onmouseleave="handleProductChange()">
+                        ${p.name}
+                    </span>
+                </td>
                 <td><span style="color:#e5e7eb; font-weight: 600;">${p.qty} pcs</span></td>
             </tr>`;
             
@@ -798,9 +818,17 @@
             const escapedKey = String(s.key);
             const escapedName = s.productName.replace(/['"]/g, '\\$&');
 
+            // ربط التمرير بجدول المبيعات اليومية أيضاً لراحة تامة في التصفح البصري
+            let pMatch = products.find(x => x && x.name === s.productName);
+            let hoverAttributes = pMatch ? `onmouseenter="handleProductHover('${pMatch.id}')" onmouseleave="handleProductChange()"` : "";
+
             salesHTML += `<tr>
                 <td>${s.date}</td>
-                <td style="text-align:left;"><span class="product-name-highlight">${s.productName}</span></td>
+                <td style="text-align:left;">
+                    <span class="product-name-highlight" ${hoverAttributes}>
+                        ${s.productName}
+                    </span>
+                </td>
                 <td style="font-weight: 600;">${s.qty}</td>
                 <td style="font-weight: 600;">${s.ca.toFixed(2)}</td>
                 <td style="color: var(--success-color); font-weight: 800;">+${s.profit.toFixed(2)}</td>
