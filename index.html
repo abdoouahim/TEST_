@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Manager Pro - Premium ID Edition</title>
+    <title>Stock & Profit Optimizer - Pro Edition</title>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -21,6 +21,7 @@
             --success-color: #10b981; 
             --danger-color: #ef4444;  
             --border-color: #243145;  
+            --warning-color: #f59e0b;
         }
 
         body {
@@ -39,10 +40,14 @@
         h2.main-title {
             text-align: center;
             color: #ffffff;
-            font-size: 28px;
-            margin-bottom: 30px;
+            font-size: 32px;
+            margin-bottom: 25px;
             font-weight: 700;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            background: linear-gradient(45deg, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         h3 {
@@ -64,14 +69,41 @@
             box-sizing: border-box;
         }
 
+        /* لوحة المؤشرات العلوية */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #1e2533;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-color);
+        }
+        .stat-card.success { border-left-color: var(--success-color); }
+        .stat-card.danger { border-left-color: var(--danger-color); }
+
+        .stat-title { font-size: 12px; color: var(--secondary-text); text-transform: uppercase; font-weight: 600; }
+        .stat-value { font-size: 22px; font-weight: 700; margin-top: 5px; color: #ffffff; }
+
         .split-grid {
             display: grid;
             grid-template-columns: 1fr 1.6fr; 
             gap: 20px;
         }
 
+        .management-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
         @media (max-width: 950px) {
-            .split-grid {
+            .split-grid, .management-grid, .dashboard-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -94,7 +126,6 @@
             font-size: 15px;
             background-color: #1f293d;
             color: #ffffff;
-            transition: all 0.3s ease;
         }
 
         input:focus, select:focus {
@@ -121,10 +152,19 @@
         }
 
         .btn { background: var(--accent-color); color: white; margin-right: 10px; }
-        .btn:hover { background: #2563eb; transform: translateY(-1px); }
+        .btn:hover { background: #2563eb; }
         
         .btn-success { background: var(--success-color); color: white; width: 100%; margin-top: 15px; }
-        .btn-success:hover { background: #059669; transform: translateY(-1px); }
+        .btn-success:hover { background: #059669; }
+
+        .btn-primary { background: #3b82f6; color: white; width: 100%; margin-top: 15px; }
+        .btn-primary:hover { background: #2563eb; }
+
+        .btn-warning { background: var(--warning-color); color: white; width: 100%; margin-top: 15px; }
+        .btn-warning:hover { background: #d97706; }
+
+        .btn-danger { background: var(--danger-color); color: white; width: 100%; margin-top: 15px; }
+        .btn-danger:hover { background: #dc2626; }
 
         .delete-btn {
             background-color: rgba(239, 68, 68, 0.15);
@@ -133,10 +173,6 @@
             padding: 6px 12px;
             font-size: 13px;
             border-radius: 6px;
-        }
-        .delete-btn:hover {
-            background-color: var(--danger-color);
-            color: white;
         }
 
         .table-responsive {
@@ -177,8 +213,6 @@
             margin: 8px 0;
             border-radius: 8px;
             border-left: 5px solid #fbbf24;
-            font-size: 14px;
-            font-weight: 500;
         }
         .low { color: var(--danger-color); font-weight: bold; }
 
@@ -189,7 +223,7 @@
             border-radius: 10px;
             border: 1px solid var(--border-color);
             margin-top: 15px;
-            display: none; /* مخفية افتراضياً لحين نجاح قراءة مسار الصورة السليم */
+            display: none; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
 
@@ -208,17 +242,31 @@
 
 <div class="container">
 
-    <h2 class="main-title">📦 Stock Manager Pro (No Login)</h2>
+    <h2 class="main-title">Stock & Profit Optimizer</h2>
 
-    <div class="card">
-        <h3>🔔 Alerts Stock</h3>
-        <div id="alerts">✅ Aucun problème de stock</div>
+    <div class="dashboard-grid">
+        <div class="stat-card">
+            <div class="stat-title">Chiffre d'Affaires Global</div>
+            <div id="statCA" class="stat-value">0.00 DH</div>
+        </div>
+        <div class="stat-card danger">
+            <div class="stat-title">Total Dépenses</div>
+            <div id="statExpenses" class="stat-value">0.00 DH</div>
+        </div>
+        <div class="stat-card success">
+            <div class="stat-title">Profit Net Réel</div>
+            <div id="statNetProfit" class="stat-value">0.00 DH</div>
+        </div>
     </div>
 
-    <div class="split-grid">
+    <div class="card">
+        <h3>Alertes Stock</h3>
+        <div id="alerts">Aucun problème de stock</div>
+    </div>
+
+    <div class="management-grid">
         <div class="card">
-            <h3>➕ Nouvelle Vente</h3>
-            
+            <h3>Nouvelle Vente</h3>
             <label for="productSelect">Sélectionner l'article :</label>
             <select id="productSelect" onchange="handleProductChange()"></select>
             
@@ -226,10 +274,10 @@
                 <img id="productLivePreview" class="product-preview-img" src="" alt="Aperçu" onload="this.style.display='block'" onerror="this.style.display='none'">
             </center>
 
-            <label for="costPriceInput">Coût de revient / Prix d'achat (Auto) :</label>
+            <label for="costPriceInput">Prix d'achat (Auto) :</label>
             <input type="number" id="costPriceInput" readonly placeholder="0.00">
             
-            <label for="salePriceInput">Prix de vente unitaire réel (DH) :</label>
+            <label for="salePriceInput">Prix de vente réel (DH) :</label>
             <input type="number" id="salePriceInput" placeholder="0.00">
             
             <label for="saleQtyInput">Quantité vendue :</label>
@@ -239,10 +287,37 @@
         </div>
 
         <div class="card">
-            <h3>📊 Historique des Ventes Journalières</h3>
+            <h3>Nouveau Produit</h3>
+            <label for="newProductName">Nom du produit :</label>
+            <input type="text" id="newProductName" placeholder="Ex: sandals Adidas Luxury">
+            
+            <label for="newProductPrice">Prix d'achat (DH) :</label>
+            <input type="number" id="newProductPrice" placeholder="0.00">
+            
+            <label for="newProductQty">Quantité initiale :</label>
+            <input type="number" id="newProductQty" placeholder="Ex: 24">
+            
+            <button class="btn-primary" onclick="addNewProduct()">Créer l'article</button>
+        </div>
+
+        <div class="card">
+            <h3>Réapprovisionnement</h3>
+            <label for="reStockSelect">Choisir le produit :</label>
+            <select id="reStockSelect"></select>
+            
+            <label for="reStockQty">Quantité ajoutée (+) :</label>
+            <input type="number" id="reStockQty" placeholder="Nombre de pièces à rajouter">
+            
+            <button class="btn-warning" onclick="replenishStock()">Ajouter au Stock</button>
+        </div>
+    </div>
+
+    <div class="split-grid">
+        <div class="card">
+            <h3>Historique des Ventes</h3>
             <div style="margin-bottom: 15px;">
-                <button class="btn" onclick="exportExcel()">📥 Exporter Excel</button>
-                <button class="btn" onclick="exportPDF()">📥 Exporter PDF</button>
+                <button class="btn" onclick="exportExcel()">Exporter Excel</button>
+                <button class="btn" onclick="exportPDF()">Exporter PDF</button>
             </div>
             <div class="table-responsive">
                 <table id="salesTable">
@@ -250,9 +325,37 @@
                         <tr>
                             <th>Date</th>
                             <th>Produit</th>
-                            <th>Quantité</th>
-                            <th>CA (DH)</th>
-                            <th>Profit (DH)</th>
+                            <th>Qté</th>
+                            <th>CA</th>
+                            <th>Profit</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Gestion des Dépenses Fixes / Pub / Transport</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                <div>
+                    <label for="expDesc">Description :</label>
+                    <input type="text" id="expDesc" placeholder="Ex: Sacs emballage / Pub FB">
+                </div>
+                <div>
+                    <label for="expAmount">Montant (DH) :</label>
+                    <input type="number" id="expAmount" placeholder="0.00">
+                </div>
+            </div>
+            <button class="btn-danger" onclick="addExpense()">Enregistrer la dépense</button>
+
+            <div class="table-responsive" style="margin-top: 20px;">
+                <table id="expensesTable">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Montant (DH)</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -263,7 +366,7 @@
     </div>
 
     <div class="card">
-        <h3>📦 État Actuel du Stock</h3>
+        <h3>État Actuel du Stock</h3>
         <div class="table-responsive">
             <table id="stockTable">
                 <thead>
@@ -294,7 +397,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // القائمة الافتراضية متطابقة بالملي مع الترتيب والـ ID في ملف الـ JSON النظيف الخاص بك
     const defaultProducts = [
         { id: "1", name: 'sneakers midium quality', qty: 24, pu: 75 },
         { id: "2", name: 'sneakers Low quality', qty: 20, pu: 62 },
@@ -317,6 +419,7 @@
 
     let products = [];
     let sales = [];
+    let expenses = [];
 
     init();
 
@@ -327,6 +430,7 @@
                 products = [...defaultProducts];
                 db.ref("products").set(products);
             }
+            products = products.filter(p => p !== null && p !== undefined);
             render();
             handleProductChange(); 
         });
@@ -334,22 +438,27 @@
         db.ref("sales").on("value", s => {
             let data = s.val() || {};
             sales = Object.keys(data).map(k => ({...data[k], key: k}));
+            calculateDashboard();
             render();
+        });
+
+        db.ref("expenses").on("value", s => {
+            let data = s.val() || {};
+            expenses = Object.keys(data).map(k => ({...data[k], key: k}));
+            calculateDashboard();
+            renderExpenses();
         });
     }
 
-    // الاعتماد الصريح والمستقر على جلب مسار الصور بالـ ID الرقمي النظيف فقط
     function handleProductChange() {
         const selectEl = document.getElementById("productSelect");
         const costInput = document.getElementById("costPriceInput");
         const previewImg = document.getElementById("productLivePreview");
         
         let id = selectEl.value;
-        if (!id && products.length > 0) {
-            id = products[0].id;
-        }
+        if (!id && products.length > 0) id = products[0].id;
         
-        let p = products.find(x => x.id == id);
+        let p = products.find(x => x && x.id == id);
         
         if (p && p.id) {
             costInput.value = p.pu;
@@ -360,13 +469,108 @@
         }
     }
 
+    function calculateDashboard() {
+        let totalCA = 0;
+        let totalProfitMargin = 0;
+        let totalExp = 0;
+
+        sales.forEach(s => {
+            totalCA += s.ca || 0;
+            totalProfitMargin += s.profit || 0;
+        });
+
+        expenses.forEach(e => {
+            totalExp += e.amount || 0;
+        });
+
+        let netProfit = totalProfitMargin - totalExp;
+
+        document.getElementById("statCA").innerText = totalCA.toFixed(2) + " DH";
+        document.getElementById("statExpenses").innerText = totalExp.toFixed(2) + " DH";
+        document.getElementById("statNetProfit").innerText = netProfit.toFixed(2) + " DH";
+    }
+
+    function addNewProduct() {
+        const nameInput = document.getElementById("newProductName");
+        const priceInput = document.getElementById("newProductPrice");
+        const qtyInput = document.getElementById("newProductQty");
+
+        let name = nameInput.value.trim();
+        let price = Number(priceInput.value);
+        let qty = Number(qtyInput.value);
+
+        if (name === "") return alert("Veuillez entrer le nom du produit.");
+        if (price <= 0 || qty < 0) return alert("Veuillez entrer des valeurs valides.");
+
+        let maxId = 0;
+        products.forEach(p => {
+            if (p && p.id && !isNaN(p.id)) {
+                let currentId = parseInt(p.id);
+                if (currentId > maxId) maxId = currentId;
+            }
+        });
+        let nextId = String(maxId + 1);
+
+        let newProduct = { id: nextId, name: name, pu: price, qty: qty };
+        products.push(newProduct);
+        
+        db.ref("products").set(products).then(() => {
+            alert("Produit créé avec succès !");
+            nameInput.value = ""; priceInput.value = ""; qtyInput.value = "";
+        });
+    }
+
+    // ميزة تجديد وتزويد كمية المخزون لمنتج موجود
+    function replenishStock() {
+        const selectEl = document.getElementById("reStockSelect");
+        const qtyInput = document.getElementById("reStockQty");
+
+        let id = selectEl.value;
+        let qtyToAdd = Number(qtyInput.value);
+
+        if(!id) return alert("Sélectionnez un produit.");
+        if(qtyToAdd <= 0) return alert("Entrez une quantité valide supérieure à 0.");
+
+        let p = products.find(x => x && x.id == id);
+        if(p) {
+            p.qty += qtyToAdd;
+            db.ref("products").set(products).then(() => {
+                alert(`Stock mis à jour ! Nouvelle quantité pour ${p.name} : ${p.qty} pcs.`);
+                qtyInput.value = "";
+            });
+        }
+    }
+
+    // إضافة ومزامنة المصاريف الجانبية
+    function addExpense() {
+        const descInput = document.getElementById("expDesc");
+        const amountInput = document.getElementById("expAmount");
+
+        let desc = descInput.value.trim();
+        let amount = Number(amountInput.value);
+
+        if(desc === "" || amount <= 0) return alert("Veuillez remplir les champs de dépenses correctement.");
+
+        let expense = { description: desc, amount: amount };
+        db.ref("expenses").push(expense).then(() => {
+            descInput.value = "";
+            amountInput.value = "";
+        });
+    }
+
+    function deleteExpense(key) {
+        if(confirm("Supprimer cette dépense ?")) {
+            db.ref("expenses").child(key).remove();
+        }
+    }
+
     function addSale(){
         const selectEl = document.getElementById("productSelect");
         const priceEl = document.getElementById("salePriceInput");
         const qtyEl = document.getElementById("saleQtyInput");
 
         let id = selectEl.value;
-        let p = products.find(x => x.id == id);
+        let p = products.find(x => x && x.id == id);
         let q = Number(qtyEl.value);
         let price = Number(priceEl.value);
 
@@ -393,7 +597,7 @@
 
     function deleteSale(firebaseKey, productName, quantity) {
         if (confirm("En supprimant cette vente, les articles seront rajoutés au stock automatiquement. Confirmer ?")) {
-            const prod = products.find(p => p.name === productName);
+            const prod = products.find(p => p && p.name === productName);
             if (prod) {
                 prod.qty += Number(quantity);
             }
@@ -404,6 +608,19 @@
         }
     }
 
+    function renderExpenses() {
+        const tableBody = document.querySelector("#expensesTable tbody");
+        let html = "";
+        expenses.forEach(e => {
+            html += `<tr>
+                <td style="text-align:left; font-weight:600;">${e.description}</td>
+                <td style="color:var(--danger-color); font-weight:bold;">${e.amount.toFixed(2)} DH</td>
+                <td><button class="delete-btn" onclick="deleteExpense('${e.key}')">Supprimer</button></td>
+            </tr>`;
+        });
+        tableBody.innerHTML = html;
+    }
+
     function render(){
         const stockTableBody = document.querySelector("#stockTable tbody");
         const alerts = document.getElementById("alerts");
@@ -412,6 +629,7 @@
         let alertsHTML = "";
 
         products.forEach(p => {
+            if(!p) return;
             stockHTML += `<tr>
                 <td><img class="thumb-img" src="images/${p.id}.png" alt="Product" onerror="this.style.visibility='hidden'"></td>
                 <td style="text-align: left; padding-left: 20px;"><b>${p.name}</b></td>
@@ -419,12 +637,12 @@
             </tr>`;
             
             if(p.qty <= 5){
-                alertsHTML += `<div class='alert'>⚠ Stock faible: <span class='low'>${p.name} (${p.qty} pcs)</span></div>`;
+                alertsHTML += `<div class='alert'>Stock faible: <span class='low'>${p.name} (${p.qty} pcs)</span></div>`;
             }
         });
 
         stockTableBody.innerHTML = stockHTML;
-        alerts.innerHTML = alertsHTML || "✅ Aucun problème de stock";
+        alerts.innerHTML = alertsHTML || "Aucun problème de stock";
 
         const salesTableBody = document.querySelector("#salesTable tbody");
         let salesHTML = "";
@@ -446,12 +664,55 @@
         });
         salesTableBody.innerHTML = salesHTML;
 
+        // تحديث قوائم الاختيار للمنتجات
         const productSelect = document.getElementById("productSelect");
+        const reStockSelect = document.getElementById("reStockSelect");
+        
         const currentSelection = productSelect.value;
-        productSelect.innerHTML = products.map(p =>
-            `<option value="${p.id}">${p.name} (Dispo: ${p.qty})</option>`
-        ).join("");
+        const currentReSelection = reStockSelect.value;
+        
+        let selectOptions = products.map(p => {
+            if(!p) return "";
+            return `<option value="${p.id}">${p.name} (Dispo: ${p.qty})</option>`;
+        }).join("");
+        
+        productSelect.innerHTML = selectOptions;
+        reStockSelect.innerHTML = selectOptions;
+        
         if(currentSelection) productSelect.value = currentSelection;
+        if(currentReSelection) reStockSelect.value = currentReSelection;
+    }
+
+    function exportExcel(){
+        if(sales.length === 0) return alert("Pas de données à exporter.");
+        let wb = XLSX.utils.book_new();
+        let ws = XLSX.utils.json_to_sheet(sales.map(s => ({
+            Date: s.date,
+            Produit: s.productName,
+            Quantite: s.qty,
+            Chiffre_Affaires: s.ca,
+            Profit: s.profit
+        })));
+        XLSX.utils.book_append_sheet(wb, ws, "Ventes");
+        XLSX.writeFile(wb, "Rapport_Ventes_Dark.xlsx");
+    }
+
+    function exportPDF(){
+        if(sales.length === 0) return alert("Pas de données à exporter.");
+        const { jsPDF } = window.jspdf;
+        let doc = new jsPDF();
+        doc.setFontSize(16);
+        doc.text("Rapport Global des Ventes", 14, 15);
+        doc.setFontSize(11);
+
+        let y = 25;
+        sales.forEach(s => {
+            if(y > 280) { doc.addPage(); y = 20; }
+            doc.text(`${s.date} | ${s.productName} | Qte: ${s.qty} | Profit: ${s.profit.toFixed(2)} DH`, 14, y);
+            y += 10;
+        });
+
+        doc.save("Rapport_Ventes_Dark.pdf");
     }
 </script>
 
