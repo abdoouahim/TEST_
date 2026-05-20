@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock & Profit Optimizer - Ultimate Edition</title>
+    <title>Stock & Profit Optimizer - Stable Edition</title>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -89,7 +89,7 @@
         .stat-title { font-size: 12px; color: var(--secondary-text); text-transform: uppercase; font-weight: 600; }
         .stat-value { font-size: 22px; font-weight: 700; margin-top: 5px; color: #ffffff; }
 
-        /* التخطيط المتقابل الرئيسي المطلوب علوياً */
+        /* الجزء المتقابل علوياً */
         .split-grid {
             display: grid;
             grid-template-columns: 1fr 1.6fr; 
@@ -266,7 +266,7 @@
             <select id="productSelect" onchange="handleProductChange()"></select>
             
             <center>
-                <img id="productLivePreview" class="product-preview-img" src="" alt="Aperçu" onload="this.style.display='block'" onerror="handleImageError(this)">
+                <img id="productLivePreview" class="product-preview-img" src="" alt="Aperçu" onload="this.style.display='block'" onerror="this.style.display='none'">
             </center>
 
             <label for="costPriceInput">Prix d'achat (Auto) :</label>
@@ -345,17 +345,6 @@
     </div>
 
     <div class="card">
-        <h3>Gestion & Mise à Jour des Images des Produits</h3>
-        <label for="editImageSelect">Sélectionner le produit à modifier :</label>
-        <select id="editImageSelect"></select>
-        
-        <label for="editImageUrl">Lien / URL de la nouvelle image :</label>
-        <input type="text" id="editImageUrl" placeholder="Ex: https://r-img.com/shoe.png أو مسار محلي">
-        
-        <button class="btn-primary" onclick="updateProductImage()">Enregistrer l'image</button>
-    </div>
-
-    <div class="card">
         <h3>Ajouter un Nouveau Produit</h3>
         <label for="newProductName">Nom du produit :</label>
         <input type="text" id="newProductName" placeholder="Ex: sandals Adidas Luxury">
@@ -365,9 +354,6 @@
         
         <label for="newProductQty">Quantité initiale :</label>
         <input type="number" id="newProductQty" placeholder="Ex: 24">
-
-        <label for="newProductImageUrl">Lien / URL de l'image (Optionnel) :</label>
-        <input type="text" id="newProductImageUrl" placeholder="Ex: images/18.png أو رابط ويب مباشر">
         
         <button class="btn-primary" onclick="addNewProduct()">Créer l'article</button>
     </div>
@@ -405,23 +391,23 @@
     const db = firebase.database();
 
     const defaultProducts = [
-        { id: "1", name: 'sneakers midium quality', qty: 24, pu: 75, img: "Images/1.PNG" },
-        { id: "2", name: 'sneakers Low quality', qty: 20, pu: 62, img: "Images/2.PNG" },
-        { id: "3", name: 'sandals NIKE', qty: 30, pu: 38, img: "Images/3.PNG" },
-        { id: "4", name: 'sandals girl (1)', qty: 24, pu: 16, img: "Images/4.PNG" },
-        { id: "5", name: 'sandals girl (2)', qty: 24, pu: 16, img: "Images/5.PNG" },
-        { id: "6", name: 'flip-flops easy to go', qty: 24, pu: 45, img: "Images/6.PNG" },
-        { id: "7", name: 'sneakers for kids', qty: 9, pu: 65, img: "Images/7.PNG" },
-        { id: "8", name: 'sandals LOULUEN', qty: 24, pu: 80, img: "Images/8.PNG" },
-        { id: "9", name: 'sandals MIKA R&B', qty: 10, pu: 40, img: "Images/9.PNG" },
-        { id: "10", name: 'SABO for Men', qty: 24, pu: 30, img: "Images/10.PNG" },
-        { id: "11", name: 'Sabo for girls', qty: 30, pu: 24, img: "Images/11.PNG" },
-        { id: "12", name: 'sandals BZIM Mtarzin', qty: 24, pu: 50, img: "Images/12.PNG" },
-        { id: "13", name: 'sandals Jeld', qty: 24, pu: 95, img: "Images/13.PNG" },
-        { id: "14", name: 'flip-flops LOULUEN', qty: 24, pu: 45, img: "Images/14.PNG" },
-        { id: "15", name: 'sandals Black Gold Brown', qty: 10, pu: 45, img: "Images/15.PNG" },
-        { id: "16", name: 'Sandals Free style', qty: 24, pu: 60, img: "Images/16.PNG" },
-        { id: "17", name: 'Sandals Proof', qty: 20, pu: 63, img: "Images/17.PNG" }
+        { id: "1", name: 'sneakers midium quality', qty: 24, pu: 75 },
+        { id: "2", name: 'sneakers Low quality', qty: 20, pu: 62 },
+        { id: "3", name: 'sandals NIKE', qty: 30, pu: 38 },
+        { id: "4", name: 'sandals girl (1)', qty: 24, pu: 16 },
+        { id: "5", name: 'sandals girl (2)', qty: 24, pu: 16 },
+        { id: "6", name: 'flip-flops easy to go', qty: 24, pu: 45 },
+        { id: "7", name: 'sneakers for kids', qty: 9, pu: 65 },
+        { id: "8", name: 'sandals LOULUEN', qty: 24, pu: 80 },
+        { id: "9", name: 'sandals MIKA R&B', qty: 10, pu: 40 },
+        { id: "10", name: 'SABO for Men', qty: 24, pu: 30 },
+        { id: "11", name: 'Sabo for girls', qty: 30, pu: 24 },
+        { id: "12", name: 'sandals BZIM Mtarzin', qty: 24, pu: 50 },
+        { id: "13", name: 'sandals Jeld', qty: 24, pu: 95 },
+        { id: "14", name: 'flip-flops LOULUEN', qty: 24, pu: 45 },
+        { id: "15", name: 'sandals Black Gold Brown', qty: 10, pu: 45 },
+        { id: "16", name: 'Sandals Free style', qty: 24, pu: 60 },
+        { id: "17", name: 'Sandals Proof', qty: 20, pu: 63 }
     ];
 
     let products = [];
@@ -433,22 +419,11 @@
     function init(){
         db.ref("products").on("value", s => {
             let data = s.val() || [];
-            
-            // موازنة لضمان نقل الصور المرقومة السابقة في حال لم تكن مسجلة في عقدة السيرفر
-            let updated = false;
             if(data.length === 0) {
                 products = [...defaultProducts];
                 db.ref("products").set(products);
             } else {
                 products = data.filter(p => p !== null && p !== undefined);
-                products.forEach(p => {
-                    let dMatch = defaultProducts.find(x => x.id == p.id);
-                    if(dMatch && !p.img) {
-                        p.img = dMatch.img;
-                        updated = true;
-                    }
-                });
-                if(updated) db.ref("products").set(products);
             }
             render();
             handleProductChange(); 
@@ -481,17 +456,12 @@
         
         if (p && p.id) {
             costInput.value = p.pu;
-            // قراءة الصورة الديناميكية المخزنة في الفايربيس (سواء كانت مسار محلي أو رابط خارجي)
-            previewImg.src = p.img || `Images/${p.id}.PNG`; 
+            // قراءة مستقرة ومباشرة من مجلد المجلد المحلي المسمى images بصيغة حروف صغيرة .png وبناءً على رقم الـ id
+            previewImg.src = `images/${p.id}.png`; 
         } else {
             costInput.value = "";
             previewImg.style.display = "none";
         }
-    }
-
-    // معالجة احتياطية ذكية في حال فشل تحميل الرابط
-    function handleImageError(img) {
-        img.style.display = 'none';
     }
 
     function calculateDashboard() {
@@ -515,38 +485,14 @@
         document.getElementById("statNetProfit").innerText = netProfit.toFixed(2) + " DH";
     }
 
-    // تعديل أو إضافة صورة جديدة لمنتج موجود
-    function updateProductImage() {
-        const selectEl = document.getElementById("editImageSelect");
-        const urlInput = document.getElementById("editImageUrl");
-
-        let id = selectEl.value;
-        let url = urlInput.value.trim();
-
-        if(!id) return alert("Sélectionnez un produit.");
-        if(url === "") return alert("Veuillez entrer un lien d'image valide.");
-
-        let p = products.find(x => x && x.id == id);
-        if(p) {
-            p.img = url;
-            db.ref("products").set(products).then(() => {
-                alert(`Image mise à jour avec succès pour : ${p.name}`);
-                urlInput.value = "";
-            });
-        }
-    }
-
-    // إنشاء منتج جديد مع إمكانية تمرير رابط صورته مباشرة لأول مرة
     function addNewProduct() {
         const nameInput = document.getElementById("newProductName");
         const priceInput = document.getElementById("newProductPrice");
         const qtyInput = document.getElementById("newProductQty");
-        const imgInput = document.getElementById("newProductImageUrl");
 
         let name = nameInput.value.trim();
         let price = Number(priceInput.value);
         let qty = Number(qtyInput.value);
-        let imgUrl = imgInput.value.trim();
 
         if (name === "") return alert("Veuillez entrer le nom du produit.");
         if (price <= 0 || qty < 0) return alert("Veuillez entrer des valeurs valides.");
@@ -560,17 +506,12 @@
         });
         let nextId = String(maxId + 1);
 
-        // إذا ترك حقل الصورة فارغاً، نضع له مساراً افتراضياً برقم الآيدي المتوقع
-        if(imgUrl === "") {
-            imgUrl = `Images/${nextId}.PNG`;
-        }
-
-        let newProduct = { id: nextId, name: name, pu: price, qty: qty, img: imgUrl };
+        let newProduct = { id: nextId, name: name, pu: price, qty: qty };
         products.push(newProduct);
         
         db.ref("products").set(products).then(() => {
             alert("Produit créé avec succès !");
-            nameInput.value = ""; priceInput.value = ""; qtyInput.value = ""; imgInput.value = "";
+            nameInput.value = ""; priceInput.value = ""; qtyInput.value = "";
         });
     }
 
@@ -682,9 +623,8 @@
 
         products.forEach(p => {
             if(!p) return;
-            let imgSrc = p.img || `Images/${p.id}.PNG`;
             stockHTML += `<tr>
-                <td><img class="thumb-img" src="${imgSrc}" alt="Product" onerror="this.style.visibility='hidden'"></td>
+                <td><img class="thumb-img" src="images/${p.id}.png" alt="Product" onerror="this.style.visibility='hidden'"></td>
                 <td style="text-align: left; padding-left: 20px;"><b>${p.name}</b></td>
                 <td><span style="color:#e5e7eb">${p.qty} pcs</span></td>
             </tr>`;
@@ -717,14 +657,12 @@
         });
         salesTableBody.innerHTML = salesHTML;
 
-        // تحديث جميع القوائم المنسدلة في الواجهة دفعة واحدة
+        // تحديث القوائم المنسدلة
         const productSelect = document.getElementById("productSelect");
         const reStockSelect = document.getElementById("reStockSelect");
-        const editImageSelect = document.getElementById("editImageSelect");
         
         const currentSelection = productSelect.value;
         const currentReSelection = reStockSelect.value;
-        const currentImgSelection = editImageSelect.value;
         
         let selectOptions = products.map(p => {
             if(!p) return "";
@@ -733,11 +671,9 @@
         
         productSelect.innerHTML = selectOptions;
         reStockSelect.innerHTML = selectOptions;
-        editImageSelect.innerHTML = selectOptions;
         
         if(currentSelection) productSelect.value = currentSelection;
         if(currentReSelection) reStockSelect.value = currentReSelection;
-        if(currentImgSelection) editImageSelect.value = currentImgSelection;
     }
 </script>
 
