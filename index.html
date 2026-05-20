@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock & Profit Optimizer - Secure Elegant Edition</title>
+    <title>Stock & Profit Optimizer - Dual Seller Edition</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -113,7 +113,7 @@
         /* شبكة الإحصائيات المتجاورة */
         .charts-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
             margin-bottom: 20px;
         }
@@ -251,6 +251,17 @@
             color: #60a5fa !important;
         }
 
+        .seller-badge {
+            background-color: #1e293b;
+            color: #f59e0b;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            letter-spacing: 0.3px;
+        }
+
         .alert {
             font-family: var(--main-font);
             background: #2c2416;
@@ -319,6 +330,12 @@
             <label for="saleDateInput">Date de la vente :</label>
             <input type="date" id="saleDateInput">
 
+            <label for="sellerSelect">Vendeur / Partenaire :</label>
+            <select id="sellerSelect">
+                <option value="Abi">Abi</option>
+                <option value="Abderrahmane & ayoub">Abderrahmane & ayoub</option>
+            </select>
+
             <label for="productSelect">Sélectionner l'article :</label>
             <select id="productSelect" onchange="handleProductChange()"></select>
             
@@ -349,6 +366,7 @@
                     <thead>
                         <tr>
                             <th>Date</th>
+                            <th>Vendeur</th>
                             <th>Produit</th>
                             <th>Qté</th>
                             <th>CA</th>
@@ -402,7 +420,7 @@
     </div>
 
     <div class="card">
-        <h3>Ajouter un Nouveau Prodit</h3>
+        <h3>Ajouter un Nouveau Produit</h3>
         <label for="newProductName">Nom du produit :</label>
         <input type="text" id="newProductName" placeholder="Ex: sandals Adidas Luxury">
         
@@ -436,11 +454,15 @@
         <div class="charts-grid">
             <div style="background: #111622; padding: 15px; border-radius: 10px;">
                 <h4 style="margin-top:0; color:#60a5fa; font-size:14px; text-transform:uppercase;">Niveaux de Stock Actuels</h4>
-                <canvas id="stockChart" style="max-height: 280px; width: 100%;"></canvas>
+                <canvas id="stockChart" style="max-height: 250px; width: 100%;"></canvas>
             </div>
             <div style="background: #111622; padding: 15px; border-radius: 10px;">
-                <h4 style="margin-top:0; color:#34d399; font-size:14px; text-transform:uppercase;">Bénéfices Générés par Produit (DH)</h4>
-                <canvas id="profitChart" style="max-height: 280px; width: 100%;"></canvas>
+                <h4 style="margin-top:0; color:#34d399; font-size:14px; text-transform:uppercase;">Bénéfices par Produit (DH)</h4>
+                <canvas id="profitChart" style="max-height: 250px; width: 100%;"></canvas>
+            </div>
+            <div style="background: #111622; padding: 15px; border-radius: 10px;">
+                <h4 style="margin-top:0; color:#a855f7; font-size:14px; text-transform:uppercase;">Profits par Vendeur / Partenaire</h4>
+                <canvas id="sellerChart" style="max-height: 250px; width: 100%;"></canvas>
             </div>
         </div>
     </div>
@@ -487,6 +509,7 @@
     
     let stockChartInstance = null;
     let profitChartInstance = null;
+    let sellerChartInstance = null;
 
     init();
 
@@ -541,7 +564,6 @@
         }
     }
 
-    // صياغة أمنية ذكية ومضمونة تمنع أي تجميد للكود أثناء حوم الفأرة
     function handleProductHover(productId) {
         const previewImg = document.getElementById("productLivePreview");
         if (productId && products.some(x => x && x.id == productId)) {
@@ -578,13 +600,25 @@
 
         let productProfits = {};
         products.forEach(p => { productProfits[p.name] = 0; });
+        
+        // فرز إحصائي دقيق ومباشر مبني على شخصين فقط
+        let sellerProfits = { "Abi": 0, "Abderrahmane & ayoub": 0 };
+
         sales.forEach(s => {
             if (productProfits[s.productName] !== undefined) {
                 productProfits[s.productName] += s.profit || 0;
             }
+            let vName = s.vendeur || "Abi";
+            // نقل مبيعات التسميات المنفصلة القديمة تلقائياً إلى الحساب المشترك الجديد لمنع التشوه
+            if(vName === "Ayoub" || vName === "Abderrahmane") vName = "Abderrahmane & ayoub";
+            
+            if (sellerProfits[vName] !== undefined) {
+                sellerProfits[vName] += s.profit || 0;
+            }
         });
         const profitData = products.map(p => productProfits[p.name] || 0);
 
+        // 1. مبيان المخزون
         if (stockChartInstance) {
             stockChartInstance.data.labels = labels;
             stockChartInstance.data.datasets[0].data = stockData;
@@ -596,25 +630,18 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Quantité Disponible',
+                        label: 'Quantité Stock',
                         data: stockData,
-                        backgroundColor: 'rgba(59, 130, 246, 0.75)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.7)',
                         borderColor: '#3b82f6',
-                        borderWidth: 1,
-                        borderRadius: 5
+                        borderWidth: 1
                     }]
                 },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { labels: { color: '#f3f4f6', font: { family: 'Plus Jakarta Sans', weight: '600' } } } },
-                    scales: {
-                        x: { ticks: { color: '#9ca3af', font: { family: 'Plus Jakarta Sans', size: 10 } }, grid: { color: '#1f293d' } },
-                        y: { ticks: { color: '#9ca3af' }, grid: { color: '#1f293d' }, beginAtZero: true }
-                    }
-                }
+                options: { responsive: true, plugins: { legend: { labels: { color: '#fff' } } } }
             });
         }
 
+        // 2. مبيان أرباح المنتجات
         if (profitChartInstance) {
             profitChartInstance.data.labels = labels;
             profitChartInstance.data.datasets[0].data = profitData;
@@ -626,21 +653,40 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Bénéfice Net (DH)',
+                        label: 'Bénéfice (DH)',
                         data: profitData,
-                        backgroundColor: 'rgba(16, 185, 129, 0.75)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.7)',
                         borderColor: '#10b981',
-                        borderWidth: 1,
-                        borderRadius: 5
+                        borderWidth: 1
                     }]
                 },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { labels: { color: '#f3f4f6', font: { family: 'Plus Jakarta Sans', weight: '600' } } } },
-                    scales: {
-                        x: { ticks: { color: '#9ca3af', font: { family: 'Plus Jakarta Sans', size: 10 } }, grid: { color: '#1f293d' } },
-                        y: { ticks: { color: '#9ca3af' }, grid: { color: '#1f293d' }, beginAtZero: true }
-                    }
+                options: { responsive: true, plugins: { legend: { labels: { color: '#fff' } } } }
+            });
+        }
+
+        // 3. مبيان مقارنة الأرباح الثنائي الفخم للشريكين
+        const sellerLabels = Object.keys(sellerProfits);
+        const sellerData = Object.values(sellerProfits);
+
+        if (sellerChartInstance) {
+            sellerChartInstance.data.labels = sellerLabels;
+            sellerChartInstance.data.datasets[0].data = sellerData;
+            sellerChartInstance.update();
+        } else {
+            const ctxSeller = document.getElementById('sellerChart').getContext('2d');
+            sellerChartInstance = new Chart(ctxSeller, {
+                type: 'pie',
+                data: {
+                    labels: sellerLabels,
+                    datasets: [{
+                        data: sellerData,
+                        backgroundColor: ['#3b82f6', '#a855f7'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    plugins: { legend: { position: 'bottom', labels: { color: '#fff', font: { family: 'Plus Jakarta Sans', weight: '600' } } } } 
                 }
             });
         }
@@ -684,13 +730,13 @@
         let qtyToAdd = Number(qtyInput.value);
 
         if(!id) return alert("Sélectionnez un produit.");
-        if(qtyToAdd <= 0) return alert("Entrez une quantité valide supérieure à 0.");
+        if(qtyToAdd <= 0) return alert("Entrez une quantité valide.");
 
         let p = products.find(x => x && x.id == id);
         if(p) {
             p.qty += qtyToAdd;
             db.ref("products").set(products).then(() => {
-                alert(`Stock mis à jour ! Nouvelle quantité pour ${p.name} : ${p.qty} pcs.`);
+                alert(`Stock mis à jour !`);
                 qtyInput.value = "";
             });
         }
@@ -703,12 +749,11 @@
         let desc = descInput.value.trim();
         let amount = Number(amountInput.value);
 
-        if(desc === "" || amount <= 0) return alert("Veuillez remplir les champs de dépenses correctement.");
+        if(desc === "" || amount <= 0) return alert("Veuillez remplir les champs.");
 
         let expense = { description: desc, amount: amount };
         db.ref("expenses").push(expense).then(() => {
-            descInput.value = "";
-            amountInput.value = "";
+            descInput.value = ""; amountInput.value = "";
         });
     }
 
@@ -720,11 +765,13 @@
 
     function addSale(){
         const dateInput = document.getElementById("saleDateInput");
+        const sellerSelect = document.getElementById("sellerSelect");
         const selectEl = document.getElementById("productSelect");
         const priceEl = document.getElementById("salePriceInput");
         const qtyEl = document.getElementById("saleQtyInput");
 
         let chosenDate = dateInput.value;
+        let sellerName = sellerSelect.value;
         let id = selectEl.value;
         let p = products.find(x => x && x.id == id);
         let q = Number(qtyEl.value);
@@ -739,6 +786,7 @@
 
         let sale = {
             date: chosenDate,
+            vendeur: sellerName,
             productName: p.name,
             qty: q,
             ca: price * q,
@@ -787,7 +835,6 @@
 
         products.forEach(p => {
             if(!p) return;
-            // التحقق والحماية من الكائنات الفارغة
             let pId = p.id ? String(p.id) : "";
             let pName = p.name ? String(p.name) : "";
 
@@ -819,12 +866,16 @@
         sales.forEach(s => {
             const escapedKey = String(s.key);
             const escapedName = s.productName.replace(/['"]/g, '\\$&');
+            
+            let sellerDisplay = s.vendeur || "Abi";
+            if(sellerDisplay === "Ayoub" || sellerDisplay === "Abderrahmane") sellerDisplay = "Abderrahmane & ayoub";
 
             let pMatch = products.find(x => x && x.name === s.productName);
             let hoverAttributes = pMatch ? `onmouseenter="handleProductHover('${pMatch.id}')" onmouseleave="handleProductChange()"` : "";
 
             salesHTML += `<tr>
                 <td>${s.date}</td>
+                <td><span class="seller-badge">${sellerDisplay}</span></td>
                 <td style="text-align:left;">
                     <span class="product-name-highlight" ${hoverAttributes}>
                         ${s.productName}
