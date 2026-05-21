@@ -97,12 +97,11 @@
         .stat-title { font-size: 11px; color: var(--secondary-text); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
         .stat-value { font-size: 24px; font-weight: 800; margin-top: 5px; color: #ffffff; }
 
-        /* 🟢 تنسيق أفقي متطور ومحاذى لنموذج البيع الجديد */
         .horizontal-form {
             display: flex;
             flex-wrap: wrap;
             gap: 12px;
-            align-items: flex-end; /* لضبط المحاذاة مع الأزرار والخانات في سطر مستقيم */
+            align-items: flex-end;
         }
 
         .form-group {
@@ -110,7 +109,6 @@
             min-width: 150px;
         }
 
-        /* تخصيص مساحة أكبر لخانة اختيار المنتج */
         .form-group.wide {
             flex: 1.8;
             min-width: 220px;
@@ -123,8 +121,8 @@
 
         .form-group-btn button {
             width: 100%;
-            margin-top: 0 !important; /* إلغاء الهامش العلوي للاتساق الأفقي */
-            height: 47px; /* يتناسب تماماً مع ارتفاع المدخلات */
+            margin-top: 0 !important;
+            height: 47px;
         }
 
         .sellers-grid {
@@ -183,7 +181,7 @@
 
         label {
             display: block;
-            margin: 0 0 6px 0; /* تم تقليص الهوامش لتناسب المظهر الأفقي */
+            margin: 0 0 6px 0;
             font-weight: 700;
             font-size: 13px;
             color: var(--secondary-text);
@@ -382,7 +380,7 @@
 
             <div class="form-group wide">
                 <label for="productSelect">Article :</label>
-                <select id="productSelect" onchange="handleProductChange()"></select>
+                <select id="productSelect" onchange="handleProductChange()" onmousemove="handleSelectHover(event)" onscroll="handleSelectHover(event)"></select>
             </div>
 
             <div class="form-group">
@@ -679,6 +677,39 @@
         } else {
             costInput.value = "";
             previewImg.style.display = "none";
+        }
+    }
+
+    // ⚡ دالة ذكية لتتبع تمرير الماوس فوق الخيارات وتغيير الصورة تلقائياً دون الضغط
+    function handleSelectHover(event) {
+        const selectEl = event.target;
+        
+        // التحقق من أن القائمة المنسدلة تحتوي على عناصر بالفعل
+        if (!selectEl || selectEl.options.length === 0) return;
+
+        // حساب أبعاد وموقع عنصر الـ Select الحالي في الشاشة
+        const rect = selectEl.getBoundingClientRect();
+        const relativeY = event.clientY - rect.bottom; 
+
+        // تفعيل التتبع الحركي الذكي فقط عندما تكون اللائحة مفتوحة ومنسدلة لأسفل
+        if (relativeY > 0) {
+            const optionHeight = 24; // متوسط ارتفاع الخيار الواحد بالبكسل داخل نظام التشغيل
+            const scrollOffset = selectEl.scrollTop || 0;
+            
+            // حساب رقم العنصر التقريبي الذي يقف عليه مؤشر الفأرة حالياً
+            let hoveredIndex = Math.floor((relativeY + scrollOffset) / optionHeight);
+            
+            if (hoveredIndex >= 0 && hoveredIndex < selectEl.options.length) {
+                let productId = selectEl.options[hoveredIndex].value;
+                let costInput = document.getElementById("costPriceInput");
+                let previewImg = document.getElementById("productLivePreview");
+                
+                let p = products.find(x => x && x.id == productId);
+                if (p) {
+                    previewImg.src = `images/${p.id}.png`;
+                    costInput.value = p.pu;
+                }
+            }
         }
     }
 
@@ -986,7 +1017,7 @@
     }
 
     function deleteSale(firebaseKey, productName, quantity) {
-        if (confirm("En supprimant cette vente, les articles seront rajoutés au stock automatiquement. Confirmer ?")) {
+        if (confirm("En supprimant cette vente, les articles seront rajoutةs au stock automatiquement. Confirmer ?")) {
             const prod = products.find(p => p && p.name === productName);
             if (prod) {
                 prod.qty += Number(quantity);
