@@ -97,7 +97,36 @@
         .stat-title { font-size: 11px; color: var(--secondary-text); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
         .stat-value { font-size: 24px; font-weight: 800; margin-top: 5px; color: #ffffff; }
 
-        /* تعديل شبكة الشركاء لتصبح 3 أعمدة متناسقة */
+        /* 🟢 تنسيق أفقي متطور ومحاذى لنموذج البيع الجديد */
+        .horizontal-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: flex-end; /* لضبط المحاذاة مع الأزرار والخانات في سطر مستقيم */
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        /* تخصيص مساحة أكبر لخانة اختيار المنتج */
+        .form-group.wide {
+            flex: 1.8;
+            min-width: 220px;
+        }
+
+        .form-group-btn {
+            flex: 0.8;
+            min-width: 160px;
+        }
+
+        .form-group-btn button {
+            width: 100%;
+            margin-top: 0 !important; /* إلغاء الهامش العلوي للاتساق الأفقي */
+            height: 47px; /* يتناسب تماماً مع ارتفاع المدخلات */
+        }
+
         .sellers-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -142,11 +171,19 @@
             .dashboard-grid, .charts-grid {
                 grid-template-columns: 1fr;
             }
+            .horizontal-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .form-group, .form-group.wide, .form-group-btn {
+                width: 100%;
+                flex: none;
+            }
         }
 
         label {
             display: block;
-            margin: 14px 0 6px;
+            margin: 0 0 6px 0; /* تم تقليص الهوامش لتناسب المظهر الأفقي */
             font-weight: 700;
             font-size: 13px;
             color: var(--secondary-text);
@@ -156,7 +193,6 @@
             font-family: var(--main-font);
             width: 100%;
             padding: 12px 14px;
-            margin-bottom: 5px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
             box-sizing: border-box;
@@ -164,6 +200,7 @@
             background-color: #1f293d;
             color: #ffffff;
             transition: all 0.2s ease;
+            height: 47px;
         }
 
         input:focus, select:focus {
@@ -194,7 +231,7 @@
         .btn { background: var(--accent-color); color: white; margin-right: 5px; padding: 8px 14px; font-size: 13px;}
         .btn:hover { background: #2563eb; }
         
-        .btn-success { background: var(--success-color); color: white; width: 100%; margin-top: 15px; }
+        .btn-success { background: var(--success-color); color: white; }
         .btn-success:hover { background: #059669; }
 
         .btn-primary { background: #3b82f6; color: white; width: 100%; margin-top: 15px; }
@@ -283,7 +320,6 @@
         }
         .low { color: var(--danger-color); font-weight: 800; }
 
-        /* 📸 تكبير حجم عرض صور المنتجات المباشرة بوضوح أعلى */
         .product-preview-img {
             max-width: 100%;
             max-height: 320px; 
@@ -295,7 +331,6 @@
             box-shadow: 0 8px 25px rgba(0,0,0,0.7);
         }
 
-        /* 📸 تكبير حجم الصور المصغرة داخل جداول المخزن */
         .thumb-img {
             width: 70px;
             height: 70px;
@@ -313,7 +348,6 @@
 
     <h2 class="main-title">Stock & Profit Optimizer</h2>
 
-    <!-- الإحصائيات العامة Global -->
     <div class="dashboard-grid">
         <div class="stat-card">
             <div class="stat-title">Chiffre d'Affaires Global</div>
@@ -330,48 +364,53 @@
     </div>
 
     <div class="card">
-        <h3>Alertes Stock</h3>
-        <div id="alerts">Aucun problème de stock</div>
-    </div>
+        <h3>Nouvelle Vente</h3>
+        <div class="horizontal-form">
+            <div class="form-group">
+                <label for="saleDateInput">Date :</label>
+                <input type="date" id="saleDateInput">
+            </div>
 
-    <!-- قسم إدخال المبيعات الجديد وجداول الشركاء الثلاثة -->
-    <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px;">
-        <div class="card">
-            <h3>Nouvelle Vente</h3>
-            <label for="saleDateInput">Date de la vente :</label>
-            <input type="date" id="saleDateInput">
+            <div class="form-group">
+                <label for="sellerSelect">Vendeur :</label>
+                <select id="sellerSelect">
+                    <option value="Abi">Abi</option>
+                    <option value="Abderrahmane">Abderrahmane</option>
+                    <option value="Ayoub">Ayoub</option>
+                </select>
+            </div>
 
-            <!-- تحديث قائمة البائعين لتشمل 3 أفراد مستقلين -->
-            <label for="sellerSelect">Vendeur / Partenaire :</label>
-            <select id="sellerSelect">
-                <option value="Abi">Abi</option>
-                <option value="Abderrahmane">Abderrahmane</option>
-                <option value="Ayoub">Ayoub</option>
-            </select>
+            <div class="form-group wide">
+                <label for="productSelect">Article :</label>
+                <select id="productSelect" onchange="handleProductChange()"></select>
+            </div>
 
-            <label for="productSelect">Sélectionner l'article :</label>
-            <select id="productSelect" onchange="handleProductChange()"></select>
-            
-            <center>
-                <img id="productLivePreview" class="product-preview-img" src="" alt="Aperçu" onload="this.style.display='block'" onerror="this.style.display='none'">
-            </center>
+            <div class="form-group">
+                <label for="costPriceInput">Achat (Auto) :</label>
+                <input type="number" id="costPriceInput" class="price-auto-highlight" readonly placeholder="0.00">
+            </div>
 
-            <label for="costPriceInput">Prix d'achat (Auto) :</label>
-            <input type="number" id="costPriceInput" class="price-auto-highlight" readonly placeholder="0.00">
-            
-            <label for="salePriceInput">Prix de vente réel (DH) :</label>
-            <input type="number" id="salePriceInput" placeholder="0.00">
-            
-            <label for="saleQtyInput">Quantité vendue :</label>
-            <input type="number" id="saleQtyInput" placeholder="Nombre de pièces">
-            
-            <button class="btn-success" onclick="addSale()">Valider la vente</button>
+            <div class="form-group">
+                <label for="salePriceInput">Prix Vente (DH) :</label>
+                <input type="number" id="salePriceInput" placeholder="0.00">
+            </div>
+
+            <div class="form-group">
+                <label for="saleQtyInput">Qté Vendue :</label>
+                <input type="number" id="saleQtyInput" placeholder="Pièces">
+            </div>
+
+            <div class="form-group-btn">
+                <button class="btn-success" onclick="addSale()">Valider la vente</button>
+            </div>
         </div>
+        
+        <center>
+            <img id="productLivePreview" class="product-preview-img" src="" alt="Aperçu" onload="this.style.display='block'" onerror="this.style.display='none'">
+        </center>
     </div>
 
-    <!-- شبكة الشركاء الثلاثة: أصبحت مقسمة لـ 3 أعمدة وبها لوحة إحصاءات فرعية لكل فرد -->
     <div class="sellers-grid">
-        <!-- شريك 1: Abi -->
         <div class="card">
             <h3>Historique de Abi</h3>
             <div class="seller-mini-dashboard">
@@ -399,7 +438,6 @@
             </div>
         </div>
 
-        <!-- شريك 2: Abderrahmane -->
         <div class="card">
             <h3>Historique de Abderrahmane</h3>
             <div class="seller-mini-dashboard">
@@ -427,7 +465,6 @@
             </div>
         </div>
 
-        <!-- شريك 3: Ayoub -->
         <div class="card">
             <h3>Historique de Ayoub</h3>
             <div class="seller-mini-dashboard">
@@ -456,7 +493,6 @@
         </div>
     </div>
 
-    <!-- باقي واجهات الحساب والتحكم بالمخزن والمصاريف -->
     <div class="card">
         <h3>Gestion des Dépenses Fixes / Pub / Transport</h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
@@ -534,14 +570,19 @@
                 <canvas id="stockChart" style="max-height: 250px; width: 100%;"></canvas>
             </div>
             <div style="background: #111622; padding: 15px; border-radius: 10px;">
-                <h4 style="margin-top:0; color:#34d399; font-size:14px; text-transform:uppercase;">Bénéfices par Produit (DH)</h4>
+                <h4 style="margin-top:0; color:#34d399; font-size:14px; text-transform:uppercase;">Bénéfices par ... (DH)</h4>
                 <canvas id="profitChart" style="max-height: 250px; width: 100%;"></canvas>
             </div>
             <div style="background: #111622; padding: 15px; border-radius: 10px;">
-                <h4 style="margin-top:0; color:#a855f7; font-size:14px; text-transform:uppercase;">Profits par Vendeur / Partenaire</h4>
+                <h4 style="margin-top:0; color:#a855f7; font-size:14px; text-transform:uppercase;">Profits par Vendeur</h4>
                 <canvas id="sellerChart" style="max-height: 250px; width: 100%;"></canvas>
             </div>
         </div>
+    </div>
+
+    <div class="card">
+        <h3>Alertes Stock</h3>
+        <div id="alerts">Aucun problème de stock</div>
     </div>
 
 </div>
@@ -653,7 +694,6 @@
         let totalProfitMargin = 0;
         let totalExp = 0;
 
-        // تهيئة كائنات الحساب الفردي للشركاء الثلاثة
         let sellerStats = {
             "Abi": { ca: 0, profit: 0 },
             "Abderrahmane": { ca: 0, profit: 0 },
@@ -664,7 +704,6 @@
             totalCA += s.ca || 0;
             totalProfitMargin += s.profit || 0;
 
-            // حساب الإحصائيات الفردية بناءً على البائع المسجل
             let vName = s.vendeur || "Abi";
             if (sellerStats[vName]) {
                 sellerStats[vName].ca += s.ca || 0;
@@ -678,12 +717,10 @@
 
         let netProfit = totalProfitMargin - totalExp;
 
-        // تحديث اللوحة العامة
         document.getElementById("statCA").innerText = totalCA.toFixed(2) + " DH";
         document.getElementById("statExpenses").innerText = totalExp.toFixed(2) + " DH";
         document.getElementById("statNetProfit").innerText = netProfit.toFixed(2) + " DH";
 
-        // تحديث اللوحات الفرعية لكل بائع ديناميكياً في الواجهة
         Object.keys(sellerStats).forEach(seller => {
             document.getElementById(`ca-${seller}`).innerText = sellerStats[seller].ca.toFixed(2) + " DH";
             document.getElementById(`profit-${seller}`).innerText = sellerStats[seller].profit.toFixed(2) + " DH";
@@ -699,7 +736,6 @@
         let productProfits = {};
         products.forEach(p => { productProfits[p.name] = 0; });
         
-        // إعداد الإحصائيات داخل المخطط البياني للشركاء الثلاثة الجدد
         let sellerProfits = { "Abi": 0, "Abderrahmane": 0, "Ayoub": 0 };
 
         sales.forEach(s => {
@@ -1080,7 +1116,6 @@
                 </td>
             </tr>`;
 
-            // توجيه الأسطر إلى الجدول الصحيح الخاص بكل فرد بناءً على الإسم
             if (sellerDisplay === "Abi") {
                 abiHTML += rowHTML;
             } else if (sellerDisplay === "Abderrahmane") {
