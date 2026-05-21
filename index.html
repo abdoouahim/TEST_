@@ -10,10 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -41,12 +39,11 @@
         }
 
         .container {
-            max-width: 1350px;
+            max-width: 1400px;
             margin: auto;
         }
 
         h2.main-title {
-            font-family: var(--main-font);
             text-align: center;
             color: #ffffff;
             font-size: 34px;
@@ -60,7 +57,6 @@
         }
 
         h3 {
-            font-family: var(--main-font);
             margin-top: 0;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 12px;
@@ -101,11 +97,32 @@
         .stat-title { font-size: 11px; color: var(--secondary-text); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
         .stat-value { font-size: 24px; font-weight: 800; margin-top: 5px; color: #ffffff; }
 
-        .split-grid {
+        /* تعديل شبكة الشركاء لتصبح 3 أعمدة متناسقة */
+        .sellers-grid {
             display: grid;
-            grid-template-columns: 1fr 1.2fr 1.2fr; 
+            grid-template-columns: repeat(3, 1fr);
             gap: 15px;
             margin-bottom: 20px;
+        }
+
+        .seller-mini-dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+            background: #111622;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .mini-stat {
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .mini-stat span {
+            display: block;
+            font-size: 14px;
+            font-weight: 800;
+            color: #ffffff;
         }
 
         .charts-grid {
@@ -115,8 +132,8 @@
             margin-bottom: 20px;
         }
 
-        @media (max-width: 1100px) {
-            .split-grid {
+        @media (max-width: 1200px) {
+            .sellers-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -155,18 +172,12 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
         }
 
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-        }
-
         .price-auto-highlight {
             background-color: #131a26 !important;
             color: #60a5fa !important;
             border-style: dashed;
             font-weight: 800;
             font-size: 16px;
-            text-shadow: 0 0 10px rgba(96, 165, 250, 0.2);
         }
 
         button {
@@ -196,19 +207,16 @@
         .btn-danger:hover { background: #dc2626; }
 
         .delete-btn {
-            font-family: var(--main-font);
             background-color: rgba(239, 68, 68, 0.12);
             color: var(--danger-color);
             border: 1px solid rgba(239, 68, 68, 0.25);
             padding: 4px 8px;
             font-size: 11px;
             border-radius: 5px;
-            margin-left: 3px;
         }
         .delete-btn:hover { background-color: var(--danger-color); color: white; }
 
         .edit-action-btn {
-            font-family: var(--main-font);
             background-color: rgba(59, 130, 246, 0.12);
             color: #60a5fa;
             border: 1px solid rgba(59, 130, 246, 0.25);
@@ -264,19 +272,7 @@
             color: #60a5fa !important;
         }
 
-        .seller-badge {
-            background-color: #1e293b;
-            color: #f59e0b;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 700;
-            border: 1px solid rgba(245, 158, 11, 0.25);
-            letter-spacing: 0.3px;
-        }
-
         .alert {
-            font-family: var(--main-font);
             background: #2c2416;
             color: #fcd34d;
             padding: 12px;
@@ -287,20 +283,22 @@
         }
         .low { color: var(--danger-color); font-weight: 800; }
 
+        /* 📸 تكبير حجم عرض صور المنتجات المباشرة بوضوح أعلى */
         .product-preview-img {
             max-width: 100%;
-            max-height: 180px;
+            max-height: 320px; 
             object-fit: contain;
             border-radius: 12px;
             border: 1px solid var(--border-color);
             margin-top: 15px;
             display: none; 
-            box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.7);
         }
 
+        /* 📸 تكبير حجم الصور المصغرة داخل جداول المخزن */
         .thumb-img {
-            width: 44px;
-            height: 44px;
+            width: 70px;
+            height: 70px;
             object-fit: cover;
             border-radius: 8px;
             border: 1px solid var(--border-color);
@@ -315,17 +313,18 @@
 
     <h2 class="main-title">Stock & Profit Optimizer</h2>
 
+    <!-- الإحصائيات العامة Global -->
     <div class="dashboard-grid">
         <div class="stat-card">
             <div class="stat-title">Chiffre d'Affaires Global</div>
             <div id="statCA" class="stat-value">0.00 DH</div>
         </div>
         <div class="stat-card danger">
-            <div class="stat-title">Total Dépenses</div>
+            <div class="stat-title">Total Dépenses Global</div>
             <div id="statExpenses" class="stat-value">0.00 DH</div>
         </div>
         <div class="stat-card success">
-            <div class="stat-title">Profit Net Réel</div>
+            <div class="stat-title">Profit Net Réel Global</div>
             <div id="statNetProfit" class="stat-value">0.00 DH</div>
         </div>
     </div>
@@ -335,17 +334,19 @@
         <div id="alerts">Aucun problème de stock</div>
     </div>
 
-    <div class="split-grid">
+    <!-- قسم إدخال المبيعات الجديد وجداول الشركاء الثلاثة -->
+    <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px;">
         <div class="card">
             <h3>Nouvelle Vente</h3>
-            
             <label for="saleDateInput">Date de la vente :</label>
             <input type="date" id="saleDateInput">
 
+            <!-- تحديث قائمة البائعين لتشمل 3 أفراد مستقلين -->
             <label for="sellerSelect">Vendeur / Partenaire :</label>
             <select id="sellerSelect">
                 <option value="Abi">Abi</option>
-                <option value="Abderrahmane & ayoub">Abderrahmane & ayoub</option>
+                <option value="Abderrahmane">Abderrahmane</option>
+                <option value="Ayoub">Ayoub</option>
             </select>
 
             <label for="productSelect">Sélectionner l'article :</label>
@@ -366,9 +367,17 @@
             
             <button class="btn-success" onclick="addSale()">Valider la vente</button>
         </div>
+    </div>
 
+    <!-- شبكة الشركاء الثلاثة: أصبحت مقسمة لـ 3 أعمدة وبها لوحة إحصاءات فرعية لكل فرد -->
+    <div class="sellers-grid">
+        <!-- شريك 1: Abi -->
         <div class="card">
             <h3>Historique de Abi</h3>
+            <div class="seller-mini-dashboard">
+                <div class="mini-stat" style="color: #60a5fa;">CA: <span id="ca-Abi">0.00 DH</span></div>
+                <div class="mini-stat" style="color: #10b981;">Profit: <span id="profit-Abi">0.00 DH</span></div>
+            </div>
             <div style="margin-bottom: 12px; display: flex;">
                 <button class="btn" onclick="exportSellerExcel('Abi')">Excel</button>
                 <button class="btn" onclick="exportSellerPDF('Abi')">PDF</button>
@@ -390,14 +399,47 @@
             </div>
         </div>
 
+        <!-- شريك 2: Abderrahmane -->
         <div class="card">
-            <h3>Historique de Abderrahmane & ayoub</h3>
+            <h3>Historique de Abderrahmane</h3>
+            <div class="seller-mini-dashboard">
+                <div class="mini-stat" style="color: #60a5fa;">CA: <span id="ca-Abderrahmane">0.00 DH</span></div>
+                <div class="mini-stat" style="color: #10b981;">Profit: <span id="profit-Abderrahmane">0.00 DH</span></div>
+            </div>
             <div style="margin-bottom: 12px; display: flex;">
-                <button class="btn" onclick="exportSellerExcel('Abderrahmane & ayoub')">Excel</button>
-                <button class="btn" onclick="exportSellerPDF('Abderrahmane & ayoub')">PDF</button>
+                <button class="btn" onclick="exportSellerExcel('Abderrahmane')">Excel</button>
+                <button class="btn" onclick="exportSellerPDF('Abderrahmane')">PDF</button>
             </div>
             <div class="table-responsive">
-                <table id="teamSalesTable">
+                <table id="abderrahmaneSalesTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Produit</th>
+                            <th>Qté</th>
+                            <th>CA</th>
+                            <th>Profit</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- شريك 3: Ayoub -->
+        <div class="card">
+            <h3>Historique de Ayoub</h3>
+            <div class="seller-mini-dashboard">
+                <div class="mini-stat" style="color: #60a5fa;">CA: <span id="ca-Ayoub">0.00 DH</span></div>
+                <div class="mini-stat" style="color: #10b981;">Profit: <span id="profit-Ayoub">0.00 DH</span></div>
+            </div>
+            <div style="margin-bottom: 12px; display: flex;">
+                <button class="btn" onclick="exportSellerExcel('Ayoub')">Excel</button>
+                <button class="btn" onclick="exportSellerPDF('Ayoub')">PDF</button>
+            </div>
+            <div class="table-responsive">
+                <table id="ayoubSalesTable">
                     <thead>
                         <tr>
                             <th>Date</th>
@@ -414,6 +456,7 @@
         </div>
     </div>
 
+    <!-- باقي واجهات الحساب والتحكم بالمخزن والمصاريف -->
     <div class="card">
         <h3>Gestion des Dépenses Fixes / Pub / Transport</h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
@@ -610,9 +653,23 @@
         let totalProfitMargin = 0;
         let totalExp = 0;
 
+        // تهيئة كائنات الحساب الفردي للشركاء الثلاثة
+        let sellerStats = {
+            "Abi": { ca: 0, profit: 0 },
+            "Abderrahmane": { ca: 0, profit: 0 },
+            "Ayoub": { ca: 0, profit: 0 }
+        };
+
         sales.forEach(s => {
             totalCA += s.ca || 0;
             totalProfitMargin += s.profit || 0;
+
+            // حساب الإحصائيات الفردية بناءً على البائع المسجل
+            let vName = s.vendeur || "Abi";
+            if (sellerStats[vName]) {
+                sellerStats[vName].ca += s.ca || 0;
+                sellerStats[vName].profit += s.profit || 0;
+            }
         });
 
         expenses.forEach(e => {
@@ -621,9 +678,16 @@
 
         let netProfit = totalProfitMargin - totalExp;
 
+        // تحديث اللوحة العامة
         document.getElementById("statCA").innerText = totalCA.toFixed(2) + " DH";
         document.getElementById("statExpenses").innerText = totalExp.toFixed(2) + " DH";
         document.getElementById("statNetProfit").innerText = netProfit.toFixed(2) + " DH";
+
+        // تحديث اللوحات الفرعية لكل بائع ديناميكياً في الواجهة
+        Object.keys(sellerStats).forEach(seller => {
+            document.getElementById(`ca-${seller}`).innerText = sellerStats[seller].ca.toFixed(2) + " DH";
+            document.getElementById(`profit-${seller}`).innerText = sellerStats[seller].profit.toFixed(2) + " DH";
+        });
     }
 
     function updateAnalyticsCharts() {
@@ -635,15 +699,14 @@
         let productProfits = {};
         products.forEach(p => { productProfits[p.name] = 0; });
         
-        let sellerProfits = { "Abi": 0, "Abderrahmane & ayoub": 0 };
+        // إعداد الإحصائيات داخل المخطط البياني للشركاء الثلاثة الجدد
+        let sellerProfits = { "Abi": 0, "Abderrahmane": 0, "Ayoub": 0 };
 
         sales.forEach(s => {
             if (productProfits[s.productName] !== undefined) {
                 productProfits[s.productName] += s.profit || 0;
             }
             let vName = s.vendeur || "Abi";
-            if(vName === "Ayoub" || vName === "Abderrahmane") vName = "Abderrahmane & ayoub";
-            
             if (sellerProfits[vName] !== undefined) {
                 sellerProfits[vName] += s.profit || 0;
             }
@@ -709,7 +772,7 @@
                     labels: sellerLabels,
                     datasets: [{
                         data: sellerData,
-                        backgroundColor: ['#3b82f6', '#a855f7'],
+                        backgroundColor: ['#3b82f6', '#a855f7', '#f59e0b'],
                         borderWidth: 0
                     }]
                 },
@@ -829,7 +892,6 @@
         qtyEl.value = "";
     }
 
-    // تعديل متطور للعملية يتضمن ميزة تعديل يوم وتاريخ إدخال البيع لحل أي خطأ
     function editSale(firebaseKey, productName, oldQuantity) {
         const prod = products.find(p => p && p.name === productName);
         if (!prod) return alert("Produit introuvable.");
@@ -837,7 +899,6 @@
         let currentSale = sales.find(s => s.key === firebaseKey);
         if (!currentSale) return alert("Vente introuvable.");
 
-        // 1. طلب تعديل التاريخ المختار للعملية (الميزة الجديدة المطلوبة)
         let oldDate = currentSale.date || new Date().toISOString().split("T")[0];
         let newDate = prompt("Modifier la date de la vente (Format: YYYY-MM-DD) :", oldDate);
         if (newDate === null) return;
@@ -846,7 +907,6 @@
             return alert("Format de date invalide ! Veuillez utiliser la formule YYYY-MM-DD.");
         }
 
-        // 2. طلب الكمية الجديدة
         let newQtyStr = prompt(`Modifier la quantité pour ${productName} :`, oldQuantity);
         if (newQtyStr === null) return;
         let newQty = Number(newQtyStr);
@@ -857,27 +917,24 @@
             return alert(`Stock insuffisant ! Stock max : ${availableStockCapacity} pcs.`);
         }
 
-        // 3. طلب السعر الجديد
         let oldPrice = (currentSale.ca / oldQuantity).toFixed(2);
         let newPriceStr = prompt("Modifier le prix de vente unitaire (DH) :", oldPrice);
         if (newPriceStr === null) return;
         let newPrice = Number(newPriceStr);
         if (isNaN(newPrice) || newPrice <= 0) return alert("Prix invalide.");
 
-        // 4. طلب تعديل اسم الشخص البائع
         let oldSeller = currentSale.vendeur || "Abi";
-        let newSeller = prompt("Modifier le nom du vendeur (Abi / Abderrahmane & ayoub) :", oldSeller);
+        let newSeller = prompt("Modifier le nom du vendeur (Abi / Abderrahmane / Ayoub) :", oldSeller);
         if (newSeller === null) return;
         newSeller = newSeller.trim();
-        if (newSeller !== "Abi" && newSeller !== "Abderrahmane & ayoub") {
-            return alert("Nom invalide ! Écrire 'Abi' ou 'Abderrahmane & ayoub'.");
+        if (newSeller !== "Abi" && newSeller !== "Abderrahmane" && newSeller !== "Ayoub") {
+            return alert("Nom invalide ! Écrire 'Abi', 'Abderrahmane' ou 'Ayoub'.");
         }
 
-        // موازنة كميات الرفوف
         prod.qty = availableStockCapacity - newQty;
 
         let updatedSale = {
-            date: newDate, // حفظ التاريخ الجديد بنجاح في السيرفر
+            date: newDate, 
             vendeur: newSeller,
             productName: productName,
             qty: newQty,
@@ -921,7 +978,6 @@
     function exportSellerExcel(sellerName) {
         let sellerSales = sales.filter(s => {
             let v = s.vendeur || "Abi";
-            if(v === "Ayoub" || v === "Abderrahmane") v = "Abderrahmane & ayoub";
             return v === sellerName;
         });
         if(sellerSales.length === 0) return alert("Pas de données à exporter.");
@@ -934,13 +990,12 @@
             Profit: s.profit
         })));
         XLSX.utils.book_append_sheet(wb, ws, "Ventes");
-        XLSX.writeFile(wb, `Rapport_Ventes_${sellerName.replace(/ & /g, '_')}.xlsx`);
+        XLSX.writeFile(wb, `Rapport_Ventes_${sellerName}.xlsx`);
     }
 
     function exportSellerPDF(sellerName) {
         let sellerSales = sales.filter(s => {
             let v = s.vendeur || "Abi";
-            if(v === "Ayoub" || v === "Abderrahmane") v = "Abderrahmane & ayoub";
             return v === sellerName;
         });
         if(sellerSales.length === 0) return alert("Pas de données à exporter.");
@@ -955,7 +1010,7 @@
             doc.text(`${s.date} | ${s.productName} | Qte: ${s.qty} | Profit: ${s.profit.toFixed(2)} DH`, 14, y);
             y += 10;
         });
-        doc.save("Rapport_Ventes_Shared.pdf");
+        doc.save(`Rapport_Ventes_${sellerName}.pdf`);
     }
 
     function render(){
@@ -991,10 +1046,12 @@
         alerts.innerHTML = alertsHTML || "Aucun problème de stock";
 
         const abiSalesTableBody = document.querySelector("#abiSalesTable tbody");
-        const teamSalesTableBody = document.querySelector("#teamSalesTable tbody");
+        const abderrahmaneSalesTableBody = document.querySelector("#abderrahmaneSalesTable tbody");
+        const ayoubSalesTableBody = document.querySelector("#ayoubSalesTable tbody");
         
         let abiHTML = "";
-        let teamHTML = "";
+        let abderrahmaneHTML = "";
+        let ayoubHTML = "";
 
         sales.sort((a,b) => new Date(b.date) - new Date(a.date));
 
@@ -1003,7 +1060,6 @@
             const escapedName = s.productName.replace(/['"]/g, '\\$&');
             
             let sellerDisplay = s.vendeur || "Abi";
-            if(sellerDisplay === "Ayoub" || sellerDisplay === "Abderrahmane") sellerDisplay = "Abderrahmane & ayoub";
 
             let pMatch = products.find(x => x && x.name === s.productName);
             let hoverAttributes = pMatch ? `onmouseenter="handleProductHover('${pMatch.id}')" onmouseleave="handleProductChange()"` : "";
@@ -1024,15 +1080,19 @@
                 </td>
             </tr>`;
 
+            // توجيه الأسطر إلى الجدول الصحيح الخاص بكل فرد بناءً على الإسم
             if (sellerDisplay === "Abi") {
                 abiHTML += rowHTML;
-            } else {
-                teamHTML += rowHTML;
+            } else if (sellerDisplay === "Abderrahmane") {
+                abderrahmaneHTML += rowHTML;
+            } else if (sellerDisplay === "Ayoub") {
+                ayoubHTML += rowHTML;
             }
         });
         
         abiSalesTableBody.innerHTML = abiHTML;
-        teamSalesTableBody.innerHTML = teamHTML;
+        abderrahmaneSalesTableBody.innerHTML = abderrahmaneHTML;
+        ayoubSalesTableBody.innerHTML = ayoubHTML;
 
         const productSelect = document.getElementById("productSelect");
         const reStockSelect = document.getElementById("reStockSelect");
